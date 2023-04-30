@@ -1,0 +1,26 @@
+# Pyflakes (F)
+# pycodestyle (E)
+# flake8-bugbear (B)
+# isort (I)
+# flake8-builtins (A)
+# pep8-naming (N)
+# flake8-print (T20)
+# flake8-annotations (ANN)
+select = [
+    "F",
+    "E",
+    "B",
+    "I",
+    "A",
+    "N",
+    "T20",
+    "ANN",
+]
+
+ignore = []
+
+line-length = 120
+
+target-version = "py311"
+
+unfixable = []
