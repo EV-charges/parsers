@@ -1,8 +1,8 @@
 import click
 
+from settings import PARSERS_TYPES, ParserType
 from src.chargemap.run import run as chargemap_run
 from src.plugshare.run import run as plugshare_run
-from settings import PARSERS_TYPES, ParserType
 
 
 @click.command()
@@ -12,7 +12,7 @@ from settings import PARSERS_TYPES, ParserType
     required=True,
     help='Parser name'
 )
-def run(name: ParserType):
+def run(name: ParserType) -> None:
     if name == ParserType.chargemap:
         chargemap_run()
 
