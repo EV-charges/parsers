@@ -12,7 +12,7 @@ from src.plugshare.run import run as plugshare_run
     required=True,
     help='Parser name'
 )
-def run(name: ParserType) -> None:
+def run(name: ParserType):
     if name == ParserType.chargemap:
         chargemap_run()
 
