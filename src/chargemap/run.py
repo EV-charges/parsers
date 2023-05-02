@@ -1,10 +1,8 @@
 import requests
 
 
-def parse():
-    requests.get(
-        url=''
-    )
+def parse() -> None:
+    requests.get(url='')
 
 
 def run() -> None:
