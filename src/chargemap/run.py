@@ -2,10 +2,9 @@ import requests
 
 
 def parse():
-    r = requests.get(
+    requests.get(
         url=''
     )
-    print(r)
 
 
 def run() -> None:
