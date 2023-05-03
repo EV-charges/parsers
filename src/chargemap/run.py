@@ -1,5 +1,6 @@
 import time
-from typing import List, Dict
+from typing import Dict, List
+
 import requests
 
 URL = "https://chargemap.com/json/charging/pools/get_from_areas"
@@ -67,6 +68,7 @@ def chargemap_parser() -> List[Dict]:
         ne_lng = sw_lng + lng_delta
 
     return result
+
 
 def run() -> None:
     pass
