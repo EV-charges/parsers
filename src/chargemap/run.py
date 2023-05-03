@@ -1,38 +1,50 @@
 import time
-from typing import Dict, List
 
 import requests
-
-URL = "https://chargemap.com/json/charging/pools/get_from_areas"
-
-# Координаты крайней правой верхней точки
-NE_LAT = 51.73723455
-NE_LNG = 0.35
-
-# Координаты начальной левой нижней точки
-SW_LAT = 51.05175436
-SW_LNG = -0.65
-
-# Значения шага
-lat_delta = 0.02136975
-lng_delta = 0.12574196
+from parsers.settings import settings
 
 
-def chargemap_parser() -> List[Dict]:
+def request(data: dict[str, str | float]) -> dict[str, int | dict]:
+    try:
+        response = requests.post(settings.URL_CM, data=data)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        raise SystemExit(e) from None
+
+
+def data_processing(response_json: dict[str, int | dict]) -> list[dict[str, int | str | float]]:
+    result = []
+    for pool in response_json['items']:
+        if pool['type'] == "cluster":
+            raise KeyError
+
+        result.append({
+            'id': pool['pool']['id'],
+            'lat': pool['lat'],
+            'lng': pool['lng'],
+            'street': pool['pool']['street_name'],
+            'city': pool['pool']['city'],
+            'name': pool['pool']['name']
+             })
+    return result
+
+
+def chargemap_parser() -> list[dict[str, int | str | float]]:
 
     # Стартовые координаты левой нижней точки
-    sw_lat = SW_LAT
-    sw_lng = SW_LNG
+    sw_lat = settings.SW_LAT_CM
+    sw_lng = settings.SW_LNG_CM
 
     # Стартовые координаты правой верхней точки
-    ne_lat = sw_lat + lat_delta
-    ne_lng = sw_lng + lng_delta
+    ne_lat = sw_lat + settings.LAT_DELTA_CM
+    ne_lng = sw_lng + settings.LNG_DELTA_CM
 
     result = []
 
     # Цикл сканирования
-    while sw_lat <= NE_LAT:
-        while sw_lng <= NE_LNG:
+    while sw_lat <= settings.NE_LAT_CM:
+        while sw_lng <= settings.NE_LNG_CM:
             data = {
                     "city": "London",
                     "NELat": ne_lat,
@@ -41,34 +53,28 @@ def chargemap_parser() -> List[Dict]:
                     "SWLng": sw_lng
                     }
 
-            response = requests.post(URL, data=data)
-            json_response = response.json()
+            response_json = request(data)
 
-            if json_response['count'] > 0:
-                for pool in json_response['items']:
-                    result.append({
-                        'id': pool['pool']['id'],
-                        'lat': pool['lat'],
-                        'lng': pool['lng'],
-                        'street': pool['pool']['name']
-
-                    })
+            if response_json['count'] > 0:
+                pools_data = data_processing(response_json)
+                result.extend(pools_data)
 
             # Сдвигаемся вправо
-            ne_lng += lng_delta
-            sw_lng += lng_delta
-            time.sleep(1)
+            ne_lng += settings.LNG_DELTA_CM
+            sw_lng += settings.LNG_DELTA_CM
+            time.sleep(settings.TIME_SLEEP)
 
         # Поднимаемся наверх
-        ne_lat += lat_delta
-        sw_lat += lat_delta
+        ne_lat += settings.LAT_DELTA_CM
+        sw_lat += settings.LAT_DELTA_CM
 
         # Возвращаемся в начало строки
-        sw_lng = SW_LNG
-        ne_lng = sw_lng + lng_delta
+        sw_lng = settings.SW_LNG_CM
+        ne_lng = sw_lng + settings.LNG_DELTA_CM
 
     return result
 
 
 def run() -> None:
-    pass
+    chargemap_parser()
+

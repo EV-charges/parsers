@@ -17,7 +17,25 @@ class ParserType(StrEnum):
 PARSERS_TYPES = [pt.value for pt in ParserType]
 
 
-class Settings(BaseSettings):
+class ChargemapSettings(BaseSettings):
+    URL_CM: str
+    TIME_SLEEP: int
+
+    NE_LAT_CM: float
+    NE_LNG_CM: float
+
+    SW_LAT_CM: float
+    SW_LNG_CM: float
+
+    LAT_DELTA_CM: float
+    LNG_DELTA_CM: float
+
+
+class Settings(ChargemapSettings):
 
     class Config:
         case_sensitive = False
+
+
+settings = Settings()
+
