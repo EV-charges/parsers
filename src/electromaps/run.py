@@ -1,6 +1,8 @@
+import time
+
 import requests
 from parsers.settings import ElectromapsSettings
-import time
+
 settings = ElectromapsSettings()
 
 
@@ -12,7 +14,6 @@ def request(data: dict) -> dict:
         time.sleep(15)
         req = requests.post(settings.URL_EM, json=data)
         return req.json()
-
 
 
 def processing_data(locations_dict: dict) -> list[dict[str, int | str | float]]:
