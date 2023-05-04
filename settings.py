@@ -30,6 +30,17 @@ class ChargemapSettings(BaseSettings):
     DELTA_CM: float = 0.06
 
 
+class ElectromapsSettings(BaseSettings):
+    URL_EM: str = 'https://www.electromaps.com/mapi/v2/locations?'
+    LONDON_COORDINATES = {
+        'NE_LAT_EM': 51.74,
+        'NE_LNG_EM': 0.4,
+        'SW_LAT_EM': 51.1,
+        'SW_LNG_EM': -0.7,
+    }
+
+
+
 class Settings(BaseSettings):
 
     class Config:
