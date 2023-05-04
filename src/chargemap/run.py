@@ -1,33 +1,36 @@
 import time
 
 import requests
-from parsers.settings import settings
+from parsers.settings import ChargemapSettings
+
+settings = ChargemapSettings()
 
 
-def request(data: dict[str, str | float]) -> dict[str, int | dict]:
+def request(data: dict[str, str | float]) -> dict[str, int | dict] | None:
     try:
         response = requests.post(settings.URL_CM, data=data)
         response.raise_for_status()
         return response.json()
-    except requests.exceptions.RequestException as e:
-        raise SystemExit(e) from None
+    except requests.exceptions.RequestException:
+        return None
 
 
 def data_processing(response_json: dict[str, int | dict]) -> list[dict[str, int | str | float]]:
-    result = []
-    for pool in response_json['items']:
-        if pool['type'] == "cluster":
-            raise KeyError
+    if response_json['count'] > 0:
+        result = []
+        for pool in response_json['items']:
+            if pool['type'] == "cluster":
+                raise KeyError(f'lat = {pool["lat"]}, lng = {pool["lng"]}')
 
-        result.append({
-            'id': pool['pool']['id'],
-            'lat': pool['lat'],
-            'lng': pool['lng'],
-            'street': pool['pool']['street_name'],
-            'city': pool['pool']['city'],
-            'name': pool['pool']['name']
-             })
-    return result
+            result.append({
+                'id': pool['pool']['id'],
+                'lat': pool['lat'],
+                'lng': pool['lng'],
+                'street': pool['pool']['street_name'],
+                'city': pool['pool']['city'],
+                'name': pool['pool']['name']
+                 })
+        return result
 
 
 def chargemap_parser() -> list[dict[str, int | str | float]]:
@@ -37,8 +40,8 @@ def chargemap_parser() -> list[dict[str, int | str | float]]:
     sw_lng = settings.SW_LNG_CM
 
     # Стартовые координаты правой верхней точки
-    ne_lat = sw_lat + settings.LAT_DELTA_CM
-    ne_lng = sw_lng + settings.LNG_DELTA_CM
+    ne_lat = sw_lat + settings.DELTA_CM
+    ne_lng = sw_lng + settings.DELTA_CM
 
     result = []
 
@@ -55,22 +58,27 @@ def chargemap_parser() -> list[dict[str, int | str | float]]:
 
             response_json = request(data)
 
-            if response_json['count'] > 0:
-                pools_data = data_processing(response_json)
+            if response_json is None:
+                time.sleep(settings.TIME_SLEEP)
+                continue
+
+            pools_data = data_processing(response_json)
+
+            if pools_data is not None:
                 result.extend(pools_data)
 
             # Сдвигаемся вправо
-            ne_lng += settings.LNG_DELTA_CM
-            sw_lng += settings.LNG_DELTA_CM
+            ne_lng += settings.DELTA_CM
+            sw_lng += settings.DELTA_CM
             time.sleep(settings.TIME_SLEEP)
 
         # Поднимаемся наверх
-        ne_lat += settings.LAT_DELTA_CM
-        sw_lat += settings.LAT_DELTA_CM
+        ne_lat += settings.DELTA_CM
+        sw_lat += settings.DELTA_CM
 
         # Возвращаемся в начало строки
         sw_lng = settings.SW_LNG_CM
-        ne_lng = sw_lng + settings.LNG_DELTA_CM
+        ne_lng = sw_lng + settings.DELTA_CM
 
     return result
 
