@@ -1,7 +1,7 @@
 import time
 
 import requests
-from parsers.settings import ChargemapSettings
+from settings import ChargemapSettings
 
 settings = ChargemapSettings()
 

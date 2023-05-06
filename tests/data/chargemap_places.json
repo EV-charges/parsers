@@ -1,0 +1,65 @@
+{
+  "count": 1,
+  "items": [
+    {
+      "lat": 51.4252777,
+      "lng": 0.099236,
+      "icon": "icon-incompatible-midaccelerated.png",
+      "type": "pool",
+      "pool": {
+        "amenities": [],
+        "city": "London",
+        "real_time_available": false,
+        "rating": null,
+        "i18n_country_id": 183,
+        "emsps": [],
+        "gps_coordinates": {
+          "lon": 0.099236,
+          "lat": 51.4252777
+        },
+        "street_name": "Cray Road",
+        "speed": {
+          "icon": "midaccelerated.svg",
+          "self": "charging_speeds/2.json",
+          "id": 2,
+          "map_icon": "midaccelerated.png"
+        },
+        "should_check_prices": false,
+        "number": "Beck Evans",
+        "schedules": [],
+        "object_state_id": 2,
+        "is_indoor": false,
+        "id": 218379,
+        "slug": "daniel-evans",
+        "can_remote_start_charge": false,
+        "can_update_charging_pool": true,
+        "is_always_open": false,
+        "can_charge_with_chargemap": false,
+        "location_type_id": 21,
+        "network_id": 2298,
+        "evse_emi3_ids": [],
+        "charging_connectors": [
+          {
+            "count": 1,
+            "available_count": 1,
+            "evse_ids": [],
+            "type": "MENNEKES_TYPE_2_CABLE_ATTACHED",
+            "connector_type": {
+              "id": 37,
+              "icon": "type2-cable-attached"
+            },
+            "power_max": 13
+          }
+        ],
+        "is_free": false,
+        "name": "daniel evans",
+        "location_type_slug": "unknown",
+        "charging_speed_id": 2,
+        "postal_code": "DA145ET",
+        "country_code": "GB",
+        "is_tesla": false,
+        "evses": []
+      }
+    }
+  ]
+}
