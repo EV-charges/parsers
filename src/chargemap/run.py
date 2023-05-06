@@ -1,6 +1,7 @@
 import time
 
 import requests
+
 from settings import ChargemapSettings
 
 settings = ChargemapSettings()
