@@ -16,8 +16,8 @@ def test_data_processing_key_exception(response: dict) -> None:
         data_processing(response)
 
 
-def test_data_processing_correct_return(chargemap_json: dict) -> None:
-    result = data_processing(chargemap_json)
+def test_data_processing_correct_return(chargemap_places_json: dict) -> None:
+    result = data_processing(chargemap_places_json)
     assert result == [{"id": 218379,
                        "lat": 51.4252777,
                        "lng": 0.099236,
