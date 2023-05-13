@@ -1,19 +1,20 @@
 import time
 
 import requests
-from parsers.settings import ElectromapsSettings
+from settings import ElectromapsSettings
 
 settings = ElectromapsSettings()
 
 
-def request(data: dict) -> dict:
-    try:
-        req = requests.post(settings.URL_EM, json=data)
+def request(data: str) -> dict:
+        while True:
+            req = requests.get(settings.URL_EM + data)
+            if req.status_code == 200:
+                break
+            else:
+                time.sleep(settings.time_sleep)
         return req.json()
-    except Exception:
-        time.sleep(15)
-        req = requests.post(settings.URL_EM, json=data)
-        return req.json()
+
 
 
 def processing_data(locations_dict: dict) -> list[dict[str, int | str | float]]:
@@ -32,6 +33,6 @@ def electromaps_parser() -> list[dict[str, int | str | float]]:
     data = settings.LONDON_COORDINATES
     return processing_data(request(data))
 
-
+print(electromaps_parser())
 def run() -> None:
     electromaps_parser()
