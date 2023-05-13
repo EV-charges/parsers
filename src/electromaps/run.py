@@ -1,6 +1,5 @@
 import requests
 from settings import ElectromapsSettings
-
 import time
 
 settings = ElectromapsSettings()
