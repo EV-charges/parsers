@@ -33,6 +33,6 @@ def electromaps_parser() -> list[dict[str, int | str | float]]:
     data = settings.LONDON_COORDINATES
     return processing_data(request(data))
 
-print(electromaps_parser())
+
 def run() -> None:
     electromaps_parser()
