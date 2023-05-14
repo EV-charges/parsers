@@ -1,6 +1,8 @@
-import requests
-from settings import ElectromapsSettings
 import time
+
+import requests
+
+from settings import ElectromapsSettings
 
 settings = ElectromapsSettings()
 
