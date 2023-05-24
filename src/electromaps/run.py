@@ -7,14 +7,19 @@ from settings import ElectromapsSettings
 settings = ElectromapsSettings()
 
 
-def request(data: str) -> dict:
+def request(data: str) -> requests.models.Response:
+    req = requests.get(settings.URL_EM + data)
+    return req
+
+
+def check_status_request(data: str) -> dict:
     while True:
-        req = requests.get(settings.URL_EM + data)
-        if req.status_code == 200:
-            break
-        else:
+        try:
+            response = request(data)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException:
             time.sleep(settings.time_sleep)
-    return req.json()
 
 
 def processing_data(locations_dict: dict) -> list[dict[str, int | str | float]]:
@@ -31,7 +36,7 @@ def processing_data(locations_dict: dict) -> list[dict[str, int | str | float]]:
 
 def electromaps_parser() -> list[dict[str, int | str | float]]:
     data = settings.LONDON_COORDINATES
-    return processing_data(request(data))
+    return processing_data(check_status_request(data))
 
 
 def run() -> None:
