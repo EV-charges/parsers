@@ -1,8 +1,9 @@
+import json
 import time
 import logging
 
-from settings import ChargemapSettings
-from src.utils.make_request import make_request
+from settings import ChargemapSettings, api_settings
+from src.utils.make_request import make_request, RequestMethod
 
 settings = ChargemapSettings()
 
@@ -16,16 +17,35 @@ def data_processing(response_json: dict[str, int | dict]) -> list[dict[str, int 
         for pool in response_json['items']:
             if pool['type'] == "cluster":
                 raise KeyError(f'lat = {pool["lat"]}, lng = {pool["lng"]}')
-
             result.append({
-                'id': pool['pool']['id'],
-                'lat': pool['lat'],
-                'lng': pool['lng'],
+                'inner_id': pool['pool']['id'],
+                'coordinates': {
+                    'lat': pool['lat'],
+                    'lng': pool['lng']
+                },
                 'street': pool['pool']['street_name'],
                 'city': pool['pool']['city'],
-                'name': pool['pool']['name']
+                'name': pool['pool']['name'],
+                'source': settings.SOURCE_NAME
                  })
         return result
+
+
+def compare_and_save_id_to_database(parser_result: list[dict[str, int | str | float]]) -> None:
+
+    places_to_database = make_request(url=api_settings.GET_LIST_ALL_PlACES + settings.SOURCE_NAME).json()
+    places_set = set()
+
+    for place in places_to_database['places']:
+        for source in place['sources']:
+            if source['source'] == settings.SOURCE_NAME:
+                inner_id = source['inner_id']
+                places_set.add(inner_id)
+
+    for place in parser_result:
+        if place['inner_id'] not in places_set:
+            place_json = json.dumps(place)
+            make_request(url=api_settings.POST_PLACES, data=place_json, method=RequestMethod.POST)
 
 
 def chargemap_parser() -> list[dict[str, int | str | float]]:
@@ -51,10 +71,15 @@ def chargemap_parser() -> list[dict[str, int | str | float]]:
                 "SWLng": sw_lng
             }
 
-            response = make_request(url=settings.PLACES_URL, data=data, timeout=settings.TIME_SLEEP)
+            response = make_request(
+                url=settings.PLACES_URL,
+                data=data,
+                timeout=settings.TIME_SLEEP,
+                method=RequestMethod.POST
+            )
+
             if response is None:
                 continue
-
             pools_data = data_processing(response.json())
 
             if pools_data is not None:
@@ -77,5 +102,6 @@ def chargemap_parser() -> list[dict[str, int | str | float]]:
 
 
 def run() -> None:
-    chargemap_parser()
+    parser_result = chargemap_parser()
+    compare_and_save_id_to_database(parser_result=parser_result)
 

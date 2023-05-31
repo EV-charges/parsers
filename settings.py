@@ -18,6 +18,7 @@ PARSERS_TYPES = [pt.value for pt in ParserType]
 
 
 class ChargemapSettings(BaseSettings):
+
     PLACES_URL: str = 'https://chargemap.com/json/charging/pools/get_from_areas'
     TIME_SLEEP: int = 1
 
@@ -28,6 +29,7 @@ class ChargemapSettings(BaseSettings):
     SW_LNG: float = -0.7
 
     DELTA: float = 0.06
+    SOURCE_NAME: str = 'chargemap'
 
 
 class ElectromapsSettings(BaseSettings):
@@ -45,10 +47,15 @@ class ElectromapsSettings(BaseSettings):
     TIME_SLEEP = 1
 
 
+class ApiSettings(BaseSettings):
+    GET_LIST_ALL_PlACES = 'http://209.38.204.96:8080/api/v1/places?limit=10000&'
+    POST_PLACES = 'http://209.38.204.96:8080/api/v1/places'
+
+
 class Settings(BaseSettings):
 
     class Config:
         case_sensitive = False
 
 
-
+api_settings = ApiSettings()

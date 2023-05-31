@@ -3,6 +3,7 @@ from enum import StrEnum, auto
 from logging import getLogger
 
 import requests
+from pydantic.types import Json
 
 logger = getLogger(__name__)
 
@@ -14,7 +15,7 @@ class RequestMethod(StrEnum):
 
 def make_request(
         url: str,
-        data: dict = None,
+        data: dict | Json = None,
         method: str = RequestMethod.GET,
         timeout: float = 10,
         retries: int = 2,
