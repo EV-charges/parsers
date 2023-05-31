@@ -1,9 +1,9 @@
 import json
-import time
 import logging
+import time
 
 from settings import ChargemapSettings, api_settings
-from src.utils.make_request import make_request, RequestMethod
+from src.utils.make_request import RequestMethod, make_request
 
 settings = ChargemapSettings()
 
