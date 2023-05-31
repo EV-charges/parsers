@@ -18,10 +18,13 @@ def test_data_processing_key_exception(response: dict) -> None:
 
 def test_data_processing_correct_return(chargemap_places_json: dict) -> None:
     result = data_processing(chargemap_places_json)
-    assert result == [{"id": 218379,
-                       "lat": 51.4252777,
-                       "lng": 0.099236,
+    assert result == [{"inner_id": 218379,
+                       'coordinates': {
+                           'lat': 51.4252777,
+                           'lng': 0.099236
+                       },
                        "city": "London",
                        "street": "Cray Road",
-                       "name": "daniel evans"
+                       "name": "daniel evans",
+                       "source": "chargemap"
                        }]
