@@ -1,6 +1,7 @@
 import json
-from settings import ElectromapsSettings, ApiSettings
-from src.utils.make_request import make_request, RequestMethod
+
+from settings import ApiSettings, ElectromapsSettings
+from src.utils.make_request import RequestMethod, make_request
 
 settings = ElectromapsSettings()
 api_settings = ApiSettings()

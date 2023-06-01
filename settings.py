@@ -23,11 +23,11 @@ class ChargemapSettings(BaseSettings):
 
     NE_LAT: float = 51.74
     NE_LNG: float = 0.4
-
     SW_LAT: float = 51.05
     SW_LNG: float = -0.7
 
     DELTA: float = 0.06
+    SOURCE_NAME: str = 'chargemap'
 
 
 class ElectromapsSettings(BaseSettings):
@@ -47,12 +47,11 @@ class ElectromapsSettings(BaseSettings):
 
 
 class ApiSettings(BaseSettings):
-    GET_LIST_ALL_PlACES = 'http://127.0.0.1:8080/api/v1/places?limit=10000&source='
-    POST_PLACES = 'http://127.0.0.1:8080/api/v1/places'
+    GET_LIST_ALL_PlACES = 'http://209.38.204.96:8080/api/v1/places?limit=10000&source='
+    POST_PLACES = 'http://209.38.204.96:8080/api/v1/places'
 
 
 class Settings(BaseSettings):
 
     class Config:
         case_sensitive = False
-

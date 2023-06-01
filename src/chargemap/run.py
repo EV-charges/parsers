@@ -1,5 +1,5 @@
-import time
 import logging
+import time
 
 from settings import ChargemapSettings
 from src.utils.make_request import make_request

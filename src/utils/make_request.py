@@ -1,9 +1,9 @@
 import time
 from enum import StrEnum, auto
 from logging import getLogger
-from pydantic.types import Json
 
 import requests
+from pydantic.types import Json
 
 logger = getLogger(__name__)
 
