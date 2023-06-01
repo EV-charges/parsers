@@ -1,19 +1,13 @@
 import time
-
-import requests
+import logging
 
 from settings import ChargemapSettings
+from src.utils.make_request import make_request
 
 settings = ChargemapSettings()
 
 
-def request(data: dict[str, str | float]) -> dict[str, int | dict] | None:
-    try:
-        response = requests.post(settings.URL_CM, data=data)
-        response.raise_for_status()
-        return response.json()
-    except requests.exceptions.RequestException:
-        return None
+logger = logging.getLogger(__name__)
 
 
 def data_processing(response_json: dict[str, int | dict]) -> list[dict[str, int | str | float]]:
@@ -37,49 +31,47 @@ def data_processing(response_json: dict[str, int | dict]) -> list[dict[str, int 
 def chargemap_parser() -> list[dict[str, int | str | float]]:
 
     # Стартовые координаты левой нижней точки
-    sw_lat = settings.SW_LAT_CM
-    sw_lng = settings.SW_LNG_CM
+    sw_lat = settings.SW_LAT
+    sw_lng = settings.SW_LNG
 
     # Стартовые координаты правой верхней точки
-    ne_lat = sw_lat + settings.DELTA_CM
-    ne_lng = sw_lng + settings.DELTA_CM
+    ne_lat = sw_lat + settings.DELTA
+    ne_lng = sw_lng + settings.DELTA
 
     result = []
 
     # Цикл сканирования
-    while sw_lat <= settings.NE_LAT_CM:
-        while sw_lng <= settings.NE_LNG_CM:
+    while sw_lat <= settings.NE_LAT:
+        while sw_lng <= settings.NE_LNG:
             data = {
-                    "city": "London",
-                    "NELat": ne_lat,
-                    "NELng": ne_lng,
-                    "SWLat": sw_lat,
-                    "SWLng": sw_lng
-                    }
+                "city": "London",
+                "NELat": ne_lat,
+                "NELng": ne_lng,
+                "SWLat": sw_lat,
+                "SWLng": sw_lng
+            }
 
-            response_json = request(data)
-
-            if response_json is None:
-                time.sleep(settings.TIME_SLEEP)
+            response = make_request(url=settings.PLACES_URL, data=data, timeout=settings.TIME_SLEEP)
+            if response is None:
                 continue
 
-            pools_data = data_processing(response_json)
+            pools_data = data_processing(response.json())
 
             if pools_data is not None:
                 result.extend(pools_data)
 
             # Сдвигаемся вправо
-            ne_lng += settings.DELTA_CM
-            sw_lng += settings.DELTA_CM
+            ne_lng += settings.DELTA
+            sw_lng += settings.DELTA
             time.sleep(settings.TIME_SLEEP)
 
         # Поднимаемся наверх
-        ne_lat += settings.DELTA_CM
-        sw_lat += settings.DELTA_CM
+        ne_lat += settings.DELTA
+        sw_lat += settings.DELTA
 
         # Возвращаемся в начало строки
-        sw_lng = settings.SW_LNG_CM
-        ne_lng = sw_lng + settings.DELTA_CM
+        sw_lng = settings.SW_LNG
+        ne_lng = sw_lng + settings.DELTA
 
     return result
 

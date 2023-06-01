@@ -2,7 +2,8 @@ import click
 
 from settings import PARSERS_TYPES, ParserType
 from src.chargemap.run import run as chargemap_run
-from src.plugshare.run import run as plugshare_run
+from src.electromaps.run import run as electromaps_run
+from src.utils.setup_logging import setup_logging
 
 
 @click.command()
@@ -13,11 +14,13 @@ from src.plugshare.run import run as plugshare_run
     help='Parser name'
 )
 def run(name: ParserType) -> None:
+    setup_logging()
+
     if name == ParserType.chargemap:
         chargemap_run()
 
-    if name == ParserType.plugshare:
-        plugshare_run()
+    if name == ParserType.electromaps:
+        electromaps_run()
 
 
 if __name__ == '__main__':

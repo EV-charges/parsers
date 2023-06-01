@@ -11,41 +11,48 @@ dotenv.load_dotenv(ENV_FILE)
 
 class ParserType(StrEnum):
     chargemap = auto()
-    plugshare = auto()
+    electromaps = auto()
 
 
 PARSERS_TYPES = [pt.value for pt in ParserType]
 
 
 class ChargemapSettings(BaseSettings):
-    URL_CM: str = 'https://chargemap.com/json/charging/pools/get_from_areas'
+    PLACES_URL: str = 'https://chargemap.com/json/charging/pools/get_from_areas'
     TIME_SLEEP: int = 1
 
-    NE_LAT_CM: float = 51.73723455
-    NE_LNG_CM: float = 0.35
+    NE_LAT: float = 51.74
+    NE_LNG: float = 0.4
 
-    SW_LAT_CM: float = 51.05175436
-    SW_LNG_CM: float = -0.65
+    SW_LAT: float = 51.05
+    SW_LNG: float = -0.7
 
-    DELTA_CM: float = 0.06
+    DELTA: float = 0.06
 
 
 class ElectromapsSettings(BaseSettings):
-    URL_EM: str = 'https://www.electromaps.com/mapi/v2/locations?'
-    # LONDON_COORDINATES = {
-    #     'NE_LAT_EM': 51.74,
-    #     'NE_LNG_EM': 0.4,
-    #     'SW_LAT_EM': 51.1,
-    #     'SW_LNG_EM': -0.7,
-    # }
-    LONDON_COORDINATES = 'latNE=51.74&lngNE=0.4&latSW=51.1&lngSW=-0.7'
-    time_sleep = 15
+    PLACES_URL: str = 'https://www.electromaps.com/mapi/v2/locations?'
+
+    NE_LAT: float = 51.74
+    NE_LNG: float = 0.4
+    SW_LAT: float = 51.05
+    SW_LNG: float = -0.7
+
+    @property
+    def coordinates(self) -> str:
+        return f'latNE={self.NE_LAT}&lngNE={self.NE_LNG}&latSW={self.SW_LAT}&lngSW={self.SW_LNG}'
+
+    TIME_SLEEP = 1
+    SOURCE_NAME: str = 'electromaps'
+
+
+class ApiSettings(BaseSettings):
+    GET_LIST_ALL_PlACES = 'http://127.0.0.1:8080/api/v1/places?limit=10000&source='
+    POST_PLACES = 'http://127.0.0.1:8080/api/v1/places'
 
 
 class Settings(BaseSettings):
 
     class Config:
         case_sensitive = False
-
-
 
