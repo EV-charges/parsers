@@ -14,14 +14,14 @@ class RequestMethod(StrEnum):
 
 def make_request(
         url: str,
-        data: dict = None,
         method: str = RequestMethod.GET,
         timeout: float = 10,
         retries: int = 2,
         sleep_time: float = 1,
-        json: dict = None,
-        params: dict = None,
-        proxy: dict = None
+        data: dict| None = None,
+        json: dict | None = None,
+        params: dict | None = None,
+        proxy: dict | None = None
 ) -> requests.Response | None:
     try:
         r = requests.request(

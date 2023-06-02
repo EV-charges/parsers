@@ -6,45 +6,49 @@ from src.utils.getting_id_places_from_db import getting_id_places_from_db
 from src.utils.make_request import RequestMethod, make_request
 
 settings = ChargemapSettings()
+# TODO: api_settings
 
 logger = logging.getLogger(__name__)
+
+# TODO:
 proxy = {
     "http": "http://7S3gTR:DQy9zH@185.240.94.231:8000",
     "https": "http://7S3gTR:DQy9zH@185.240.94.231:8000"
 }
 
 
-def data_processing_and_save_db(response_json: dict[str, int | dict], places_id_set:set[int]) -> int:
+def data_processing_and_save_db(response_json: dict[str, int | dict], places_id_set: set[int]) -> int:
     count_add_places = 0
-    try:
-        if response_json['count'] > 0:
-            for pool in response_json['items']:
-                if pool['type'] == "cluster":
-                    raise KeyError(f'Incorrect scale lat = {pool["lat"]}, lng = {pool["lng"]}')
-                if pool['pool']['id'] in places_id_set:
-                    continue
-                place = {
-                    'inner_id': pool['pool']['id'],
-                    'coordinates': {
-                        'lat': pool['lat'],
-                        'lng': pool['lng']
-                    },
-                    'street': pool['pool']['street_name'],
-                    'city': pool['pool']['city'],
-                    'name': pool['pool']['name'],
-                    'source': settings.SOURCE_NAME
-                }
-                response = make_request(url=api_settings.POST_PLACES, json=place, method=RequestMethod.POST)
-                if response is not None:
-                    count_add_places += 1
+    if response_json['count'] > 0:
+        for pool in response_json['items']:
 
-    except KeyError as e:
-        logger.error(e)
+            if pool['type'] == 'cluster':
+                logger.error(f"Incorrect scale lat = {pool['lat']}, lng = {pool['lng']}")
+                continue
+
+            if pool['pool']['id'] in places_id_set:
+                continue
+
+            place = {
+                'inner_id': pool['pool']['id'],
+                'coordinates': {
+                    'lat': pool['lat'],
+                    'lng': pool['lng']
+                },
+                'street': pool['pool']['street_name'],
+                'city': pool['pool']['city'],
+                'name': pool['pool']['name'],
+                'source': settings.SOURCE_NAME
+            }
+
+            response = make_request(url=api_settings.POST_PLACES, json=place, method=RequestMethod.POST)
+            if response:
+                count_add_places += 1
 
     return count_add_places
 
 
-def chargemap_parser() -> None:
+def _chargemap_parser() -> None:
     # Стартовые координаты левой нижней точки
     sw_lat = settings.SW_LAT
     sw_lng = settings.SW_LNG
@@ -54,6 +58,7 @@ def chargemap_parser() -> None:
     ne_lng = sw_lng + settings.DELTA
 
     places_id_set = getting_id_places_from_db(source_name=settings.SOURCE_NAME)
+    logger.info(f'get {len(places_id_set)} places from db')
     count_add_places = 0
 
     # Цикл сканирования
@@ -72,7 +77,9 @@ def chargemap_parser() -> None:
                 data=data,
                 timeout=settings.TIME_SLEEP,
                 method=RequestMethod.POST,
-                proxy=proxy
+                proxy=proxy,
+                # cooky=
+                # headers=
             )
 
             if response is None:
@@ -94,6 +101,13 @@ def chargemap_parser() -> None:
         ne_lng = sw_lng + settings.DELTA
 
     logger.info(f'{count_add_places} places sent to the database')
+
+
+def chargemap_parser():
+    try:
+        _chargemap_parser()
+    except Exception as e:  # noqa
+        logger.error(e)
 
 
 def run() -> None:
