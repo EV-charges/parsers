@@ -48,8 +48,9 @@ class ElectromapsSettings(BaseSettings):
 
 
 class ApiSettings(BaseSettings):
-    GET_LIST_ALL_PlACES = 'http://209.38.204.96:8080/api/v1/places?limit=10000&'
+    GET_LIST_ALL_PlACES = 'http://209.38.204.96:8080/api/v1/places'
     POST_PLACES = 'http://209.38.204.96:8080/api/v1/places'
+    NUMBER_RECORDS_IN_ONE_QUERY: int = 100
 
 
 class Settings(BaseSettings):

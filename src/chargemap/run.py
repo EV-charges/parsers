@@ -1,55 +1,50 @@
-import json
 import logging
 import time
 
 from settings import ChargemapSettings, api_settings
+from src.utils.getting_id_places_from_db import getting_id_places_from_db
 from src.utils.make_request import RequestMethod, make_request
 
 settings = ChargemapSettings()
 
-
 logger = logging.getLogger(__name__)
+proxy = {
+    "http": "http://7S3gTR:DQy9zH@185.240.94.231:8000",
+    "https": "http://7S3gTR:DQy9zH@185.240.94.231:8000"
+}
 
 
-def data_processing(response_json: dict[str, int | dict]) -> list[dict[str, int | str | float]]:
-    if response_json['count'] > 0:
-        result = []
-        for pool in response_json['items']:
-            if pool['type'] == "cluster":
-                raise KeyError(f'lat = {pool["lat"]}, lng = {pool["lng"]}')
-            result.append({
-                'inner_id': pool['pool']['id'],
-                'coordinates': {
-                    'lat': pool['lat'],
-                    'lng': pool['lng']
-                },
-                'street': pool['pool']['street_name'],
-                'city': pool['pool']['city'],
-                'name': pool['pool']['name'],
-                'source': settings.SOURCE_NAME
-                 })
-        return result
+def data_processing_and_save_db(response_json: dict[str, int | dict], places_id_set:set[int]) -> int:
+    count_add_places = 0
+    try:
+        if response_json['count'] > 0:
+            for pool in response_json['items']:
+                if pool['type'] == "cluster":
+                    raise KeyError(f'Incorrect scale lat = {pool["lat"]}, lng = {pool["lng"]}')
+                if pool['pool']['id'] in places_id_set:
+                    continue
+                place = {
+                    'inner_id': pool['pool']['id'],
+                    'coordinates': {
+                        'lat': pool['lat'],
+                        'lng': pool['lng']
+                    },
+                    'street': pool['pool']['street_name'],
+                    'city': pool['pool']['city'],
+                    'name': pool['pool']['name'],
+                    'source': settings.SOURCE_NAME
+                }
+                response = make_request(url=api_settings.POST_PLACES, json=place, method=RequestMethod.POST)
+                if response is not None:
+                    count_add_places += 1
+
+    except KeyError as e:
+        logger.error(e)
+
+    return count_add_places
 
 
-def compare_and_save_id_to_database(parser_result: list[dict[str, int | str | float]]) -> None:
-
-    places_to_database = make_request(url=api_settings.GET_LIST_ALL_PlACES + settings.SOURCE_NAME).json()
-    places_set = set()
-
-    for place in places_to_database['places']:
-        for source in place['sources']:
-            if source['source'] == settings.SOURCE_NAME:
-                inner_id = source['inner_id']
-                places_set.add(inner_id)
-
-    for place in parser_result:
-        if place['inner_id'] not in places_set:
-            place_json = json.dumps(place)
-            make_request(url=api_settings.POST_PLACES, data=place_json, method=RequestMethod.POST)
-
-
-def chargemap_parser() -> list[dict[str, int | str | float]]:
-
+def chargemap_parser() -> None:
     # Стартовые координаты левой нижней точки
     sw_lat = settings.SW_LAT
     sw_lng = settings.SW_LNG
@@ -58,7 +53,8 @@ def chargemap_parser() -> list[dict[str, int | str | float]]:
     ne_lat = sw_lat + settings.DELTA
     ne_lng = sw_lng + settings.DELTA
 
-    result = []
+    places_id_set = getting_id_places_from_db(source_name=settings.SOURCE_NAME)
+    count_add_places = 0
 
     # Цикл сканирования
     while sw_lat <= settings.NE_LAT:
@@ -75,15 +71,14 @@ def chargemap_parser() -> list[dict[str, int | str | float]]:
                 url=settings.PLACES_URL,
                 data=data,
                 timeout=settings.TIME_SLEEP,
-                method=RequestMethod.POST
+                method=RequestMethod.POST,
+                proxy=proxy
             )
 
             if response is None:
                 continue
-            pools_data = data_processing(response.json())
 
-            if pools_data is not None:
-                result.extend(pools_data)
+            count_add_places += data_processing_and_save_db(response.json(), places_id_set)
 
             # Сдвигаемся вправо
             ne_lng += settings.DELTA
@@ -98,10 +93,8 @@ def chargemap_parser() -> list[dict[str, int | str | float]]:
         sw_lng = settings.SW_LNG
         ne_lng = sw_lng + settings.DELTA
 
-    return result
+    logger.info(f'{count_add_places} places sent to the database')
 
 
 def run() -> None:
-    parser_result = chargemap_parser()
-    compare_and_save_id_to_database(parser_result=parser_result)
-
+    chargemap_parser()
