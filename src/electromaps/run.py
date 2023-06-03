@@ -1,7 +1,9 @@
-import json
+import schedule
 
 from settings import ApiSettings, ElectromapsSettings
 from src.utils.make_request import RequestMethod, make_request
+from src.utils.setup_logging import setup_logging
+from src.utils.getting_id_places_from_db import getting_id_places_from_db
 
 settings = ElectromapsSettings()
 api_settings = ApiSettings()
@@ -15,7 +17,7 @@ def processing_data(locations_dict: dict) -> list[dict[str, int | str | float]]:
             'coordinates': {
                 'lat': location['latitude'],
                 'lng': location['longitude']
-                },
+            },
             'name': location['name'],
             'source': settings.SOURCE_NAME
 
@@ -23,30 +25,16 @@ def processing_data(locations_dict: dict) -> list[dict[str, int | str | float]]:
     return result
 
 
-def electromaps_parser() -> list[dict[str, int | str | float]]:
+def electromaps_parser():  # -> list[dict[str, int | str | float]]
+    already_saved_id = getting_id_places_from_db(settings.SOURCE_NAME)
+
     coordinates = settings.coordinates
     response = make_request(url=settings.PLACES_URL + coordinates)
-    return processing_data(response.json())
-
-
-def record_new_places() -> None:
-    places_from_db = make_request(url=api_settings.GET_LIST_ALL_PlACES + settings.SOURCE_NAME).json()
-    already_saved_id = set()
-
-    for place in places_from_db['places']:
-        for source in place['sources']:
-            if source['source'] == settings.SOURCE_NAME:
-                inner_id = source['inner_id']
-                already_saved_id.add(inner_id)
-
-    new_parsing_places = electromaps_parser()
+    new_parsing_places = processing_data(response.json())
     for place in new_parsing_places:
         if place['inner_id'] not in already_saved_id:
-            place_json = json.dumps(place)
-            make_request(url=api_settings.POST_PLACES, data=place_json, method=RequestMethod.POST)
+            make_request(url=api_settings.POST_PLACES, data=place, method=RequestMethod.POST)
 
 
 def run() -> None:
-    record_new_places()
-
-
+    electromaps_parser()
