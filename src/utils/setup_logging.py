@@ -7,6 +7,3 @@ def setup_logging() -> None:
         level=logging.INFO,
         datefmt='%d-%m-%Y %H:%M:%S'
     )
-
-
-setup_logging()
