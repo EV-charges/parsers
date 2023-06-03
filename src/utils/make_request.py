@@ -18,7 +18,7 @@ def make_request(
         timeout: float = 10,
         retries: int = 2,
         sleep_time: float = 1,
-        data: dict| None = None,
+        data: dict | None = None,
         json: dict | None = None,
         params: dict | None = None,
         proxy: dict | None = None

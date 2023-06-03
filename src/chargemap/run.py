@@ -1,20 +1,16 @@
 import logging
 import time
 
-from settings import ChargemapSettings, api_settings
+import schedule
+
+from settings import ApiSettings, ChargemapSettings
 from src.utils.getting_id_places_from_db import getting_id_places_from_db
 from src.utils.make_request import RequestMethod, make_request
 
 settings = ChargemapSettings()
-# TODO: api_settings
+api_settings = ApiSettings()
 
 logger = logging.getLogger(__name__)
-
-# TODO:
-proxy = {
-    "http": "http://7S3gTR:DQy9zH@185.240.94.231:8000",
-    "https": "http://7S3gTR:DQy9zH@185.240.94.231:8000"
-}
 
 
 def data_processing_and_save_db(response_json: dict[str, int | dict], places_id_set: set[int]) -> int:
@@ -77,9 +73,6 @@ def _chargemap_parser() -> None:
                 data=data,
                 timeout=settings.TIME_SLEEP,
                 method=RequestMethod.POST,
-                proxy=proxy,
-                # cooky=
-                # headers=
             )
 
             if response is None:
@@ -103,11 +96,14 @@ def _chargemap_parser() -> None:
     logger.info(f'{count_add_places} places sent to the database')
 
 
-def chargemap_parser():
+def chargemap_parser() -> None:
     try:
-        _chargemap_parser()
+        schedule.every().day.at('22:19').do(_chargemap_parser)
     except Exception as e:  # noqa
         logger.error(e)
+
+    while True:
+        schedule.run_pending()
 
 
 def run() -> None:

@@ -57,6 +57,3 @@ class Settings(BaseSettings):
 
     class Config:
         case_sensitive = False
-
-
-api_settings = ApiSettings()
