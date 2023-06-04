@@ -14,11 +14,14 @@ class RequestMethod(StrEnum):
 
 def make_request(
         url: str,
-        data: dict = None,
         method: str = RequestMethod.GET,
         timeout: float = 10,
         retries: int = 2,
         sleep_time: float = 1,
+        data: dict | None = None,
+        json: dict | None = None,
+        params: dict | None = None,
+        proxy: dict | None = None
 ) -> requests.Response | None:
     try:
         r = requests.request(
@@ -26,6 +29,9 @@ def make_request(
             url=url,
             data=data,
             timeout=timeout,
+            params=params,
+            json=json,
+            proxies=proxy
         )
         r.raise_for_status()
     except requests.exceptions.RequestException as e:
@@ -38,6 +44,9 @@ def make_request(
                 method=method,
                 timeout=timeout,
                 retries=retries - 1,
+                json=json,
+                params=params,
+                proxy=proxy
             )
         logger.info(f'Failed to make request to {method.upper()} {url}')
         return None
