@@ -3,13 +3,13 @@ import time
 
 import schedule
 
-from settings import ApiSettings, ChargemapSettings
+from settings import AllParsersSettings, ApiSettings, ChargemapSettings
 from src.utils.getting_id_places_from_db import getting_id_places_from_db
 from src.utils.make_request import RequestMethod, make_request
 
 settings = ChargemapSettings()
 api_settings = ApiSettings()
-
+time_settings = AllParsersSettings()
 logger = logging.getLogger(__name__)
 
 
@@ -98,13 +98,12 @@ def _chargemap_parser() -> None:
 
 def chargemap_parser() -> None:
     try:
-        schedule.every().day.at('22:19').do(_chargemap_parser)
-    except Exception as e:  # noqa
+        _chargemap_parser()
+    except Exception as e:
         logger.error(e)
-
-    while True:
-        schedule.run_pending()
 
 
 def run() -> None:
-    chargemap_parser()
+    schedule.every().day.at(time_settings.PARSERS_START_TIME).do(chargemap_parser)
+    while True:
+        schedule.run_pending()

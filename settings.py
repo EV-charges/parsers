@@ -53,7 +53,8 @@ class ApiSettings(BaseSettings):
     NUMBER_RECORDS_IN_ONE_QUERY: int = 100
 
 
-class Settings(BaseSettings):
+class AllParsersSettings(BaseSettings):
+    PARSERS_START_TIME: str = '12:00'
 
     class Config:
         case_sensitive = False
