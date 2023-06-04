@@ -1,18 +1,17 @@
+import time
+
 import schedule
 import logging
 
-from settings import ApiSettings, ElectromapsSettings
+from settings import ApiSettings, ElectromapsSettings, TimeSettings
 from src.utils.make_request import RequestMethod, make_request
 from src.utils.getting_id_places_from_db import getting_id_places_from_db
 
 settings = ElectromapsSettings()
 api_settings = ApiSettings()
+time_settings = TimeSettings()
 
 logger = logging.getLogger(__name__)
-
-
-# TODO: add scheduling; every day at 12:00
-# TODO: add additional logging
 
 
 def processing_data(
@@ -30,15 +29,17 @@ def processing_data(
             'source': settings.SOURCE_NAME
 
         })
+    logger.info(f'Received {len(result)} places from {settings.SOURCE_NAME}')
     return result
 
 
-def electromaps_parser():  # -> list[dict[str, int | str | float]]
-    already_saved_id = getting_id_places_from_db(settings.SOURCE_NAME)
-    logger.info(f'get {len(already_saved_id)} already saved ids from db')
+def _electromaps_parser():  # -> list[dict[str, int | str | float]]
+    already_saved_ids = getting_id_places_from_db(settings.SOURCE_NAME)
+    logger.info(f'get {len(already_saved_ids)} already saved ids from db')
 
     coordinates = settings.coordinates
     response = make_request(url=settings.PLACES_URL + coordinates)
+
     if not response:
         logger.error('can not get places')
         return
@@ -46,8 +47,8 @@ def electromaps_parser():  # -> list[dict[str, int | str | float]]
     new_parsing_places = processing_data(response.json())
 
     places_added = 0
-    for place in new_parsing_places[:100]:
-        if place['inner_id'] in already_saved_id:
+    for place in new_parsing_places:
+        if place['inner_id'] in already_saved_ids:
             continue
 
         r = make_request(
@@ -62,8 +63,16 @@ def electromaps_parser():  # -> list[dict[str, int | str | float]]
     logger.info(f'{places_added} places added id db')
 
 
-def run() -> None:
+def electromaps_parser():
     try:
-        electromaps_parser()
-    except Exception as e:  # noqa
+        _electromaps_parser()
+    except Exception as e:
         logger.error(e)
+
+
+def run() -> None:
+    schedule.every().day.at(time_settings.PARSERS_START_TIME).do(electromaps_parser())
+    while True:
+        schedule.run_pending()
+        logger.info(f"Waiting time {time_settings.SLEEP_TIME}")
+        time.sleep(time_settings.SLEEP_TIME)
