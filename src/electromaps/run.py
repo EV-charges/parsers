@@ -3,13 +3,13 @@ import time
 import schedule
 import logging
 
-from settings import ApiSettings, ElectromapsSettings, TimeSettings
+from settings import ApiSettings, ElectromapsSettings, AllParsersSettings
 from src.utils.make_request import RequestMethod, make_request
 from src.utils.getting_id_places_from_db import getting_id_places_from_db
 
 settings = ElectromapsSettings()
 api_settings = ApiSettings()
-time_settings = TimeSettings()
+time_settings = AllParsersSettings()
 
 logger = logging.getLogger(__name__)
 

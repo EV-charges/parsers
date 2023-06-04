@@ -53,7 +53,6 @@ class ApiSettings(BaseSettings):
     NUMBER_RECORDS_IN_ONE_QUERY: int = 100
 
 
-<<<<<<< Updated upstream
 class ApiSettings(BaseSettings):
     GET_LIST_ALL_PlACES = 'http://209.38.204.96:8080/api/v1/places'
     POST_PLACES = 'http://209.38.204.96:8080/api/v1/places'
@@ -62,14 +61,10 @@ class ApiSettings(BaseSettings):
 
 class AllParsersSettings(BaseSettings):
     PARSERS_START_TIME: str = '12:00'
-=======
-class TimeSettings(BaseSettings):
-    PARSERS_START_TIME = ':00'
-    SLEEP_TIME = 1
+    SLEEP_TIME: int = 1
 
 
 class Settings(BaseSettings):
->>>>>>> Stashed changes
 
     class Config:
         case_sensitive = False
