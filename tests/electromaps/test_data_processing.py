@@ -1,7 +1,7 @@
 from src.electromaps.run import processing_data
 
 
-def test_processing_data():
+def test_processing_data() -> dict:
     res = processing_data(locations_dict=[
         {
             'id': 8272,
@@ -11,7 +11,6 @@ def test_processing_data():
             'name': 'London Royal Victoria Docks Tesla Supercharger'
         }]
     )
-    a = 1
     assert res == [
         {
             'coordinates': {

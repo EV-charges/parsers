@@ -1,11 +1,11 @@
+import logging
 import time
 
 import schedule
-import logging
 
-from settings import ApiSettings, ElectromapsSettings, AllParsersSettings
-from src.utils.make_request import RequestMethod, make_request
+from settings import AllParsersSettings, ApiSettings, ElectromapsSettings
 from src.utils.getting_id_places_from_db import getting_id_places_from_db
+from src.utils.make_request import RequestMethod, make_request
 
 settings = ElectromapsSettings()
 api_settings = ApiSettings()
@@ -33,7 +33,7 @@ def processing_data(
     return result
 
 
-def _electromaps_parser():  # -> list[dict[str, int | str | float]]
+def _electromaps_parser() -> list[dict[str, int | str | float]]:
     already_saved_ids = getting_id_places_from_db(settings.SOURCE_NAME)
     logger.info(f'get {len(already_saved_ids)} already saved ids from db')
 

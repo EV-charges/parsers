@@ -53,12 +53,6 @@ class ApiSettings(BaseSettings):
     NUMBER_RECORDS_IN_ONE_QUERY: int = 100
 
 
-class ApiSettings(BaseSettings):
-    GET_LIST_ALL_PlACES = 'http://209.38.204.96:8080/api/v1/places'
-    POST_PLACES = 'http://209.38.204.96:8080/api/v1/places'
-    NUMBER_RECORDS_IN_ONE_QUERY: int = 100
-
-
 class AllParsersSettings(BaseSettings):
     PARSERS_START_TIME: str = '12:00'
     SLEEP_TIME: int = 1
