@@ -41,7 +41,7 @@ def _electromaps_parser():  # -> list[dict[str, int | str | float]]
     response = make_request(url=settings.PLACES_URL + coordinates)
 
     if not response:
-        logger.error('can not get places')
+        logger.error('Can not get places')
         return
 
     new_parsing_places = processing_data(response.json())
@@ -55,15 +55,15 @@ def _electromaps_parser():  # -> list[dict[str, int | str | float]]
             url=api_settings.POST_PLACES,
             json=place,
             method=RequestMethod.POST,
-            allow_satus_codes=(409,)
+            allow_status_codes=(409,)
         )
         if r:
             places_added += 1
 
-    logger.info(f'{places_added} places added id db')
+    logger.info(f'All {places_added} places added id db')
 
 
-def electromaps_parser():
+def electromaps_parser() -> None:
     try:
         _electromaps_parser()
     except Exception as e:
@@ -71,8 +71,7 @@ def electromaps_parser():
 
 
 def run() -> None:
-    schedule.every().day.at(time_settings.PARSERS_START_TIME).do(electromaps_parser())
+    schedule.every().day.at(time_settings.PARSERS_START_TIME).do(electromaps_parser)
     while True:
         schedule.run_pending()
-        logger.info(f"Waiting time {time_settings.SLEEP_TIME}")
         time.sleep(time_settings.SLEEP_TIME)

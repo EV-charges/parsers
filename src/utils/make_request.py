@@ -22,7 +22,7 @@ def make_request(
         json: dict = None,
         params: dict = None,
         proxy: dict = None,
-        allow_satus_codes: tuple[int] = None
+        allow_status_codes: tuple[int, ...] = None
 ) -> requests.Response | None:
     try:
         r = requests.request(
@@ -34,7 +34,7 @@ def make_request(
             json=json,
             proxies=proxy
         )
-        if allow_satus_codes and r.status_code in allow_satus_codes:
+        if allow_status_codes and r.status_code in allow_status_codes:
             return
 
         r.raise_for_status()
