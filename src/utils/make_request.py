@@ -14,14 +14,15 @@ class RequestMethod(StrEnum):
 
 def make_request(
         url: str,
+        data: dict = None,
         method: str = RequestMethod.GET,
         timeout: float = 10,
         retries: int = 2,
         sleep_time: float = 1,
-        data: dict | None = None,
-        json: dict | None = None,
-        params: dict | None = None,
-        proxy: dict | None = None
+        json: dict = None,
+        params: dict = None,
+        proxy: dict = None,
+        allow_status_codes: tuple[int, ...] = None
 ) -> requests.Response | None:
     try:
         r = requests.request(
@@ -33,6 +34,9 @@ def make_request(
             json=json,
             proxies=proxy
         )
+        if allow_status_codes and r.status_code in allow_status_codes:
+            return
+
         r.raise_for_status()
     except requests.exceptions.RequestException as e:
         logger.error(e)

@@ -24,7 +24,6 @@ class ChargemapSettings(BaseSettings):
 
     NE_LAT: float = 51.74
     NE_LNG: float = 0.4
-
     SW_LAT: float = 51.05
     SW_LNG: float = -0.7
 
@@ -45,6 +44,7 @@ class ElectromapsSettings(BaseSettings):
         return f'latNE={self.NE_LAT}&lngNE={self.NE_LNG}&latSW={self.SW_LAT}&lngSW={self.SW_LNG}'
 
     TIME_SLEEP = 1
+    SOURCE_NAME: str = 'electromaps'
 
 
 class ApiSettings(BaseSettings):
@@ -55,6 +55,10 @@ class ApiSettings(BaseSettings):
 
 class AllParsersSettings(BaseSettings):
     PARSERS_START_TIME: str = '12:00'
+    SLEEP_TIME: int = 1
+
+
+class Settings(BaseSettings):
 
     class Config:
         case_sensitive = False
