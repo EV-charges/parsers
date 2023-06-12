@@ -1,0 +1,11 @@
+.git
+.github
+.ruff_cache
+__pycache__
+.gitignore
+README.md
+.env
+.env_docker
+.pytest_cache
+tests
+.python-version

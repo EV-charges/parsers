@@ -6,6 +6,7 @@ import schedule
 from settings import AllParsersSettings, ApiSettings, ChargemapSettings
 from src.utils.getting_id_places_from_db import getting_id_places_from_db
 from src.utils.make_request import RequestMethod, make_request
+from src.utils.make_request_proxy import make_request_proxy
 
 settings = ChargemapSettings()
 api_settings = ApiSettings()
@@ -56,6 +57,8 @@ def _chargemap_parser() -> None:
     places_id_set = getting_id_places_from_db(source_name=settings.SOURCE_NAME)
     logger.info(f'get {len(places_id_set)} places from db')
     count_add_places = 0
+    good_request = 0
+    count_request = 0
 
     # Цикл сканирования
     while sw_lat <= settings.NE_LAT:
@@ -67,16 +70,21 @@ def _chargemap_parser() -> None:
                 "SWLat": sw_lat,
                 "SWLng": sw_lng
             }
-
-            response = make_request(
+            count_request += 1
+            print(f'Запрос номер {count_request}')
+            response = make_request_proxy(
                 url=settings.PLACES_URL,
                 data=data,
-                timeout=settings.TIME_SLEEP,
+                sleep_time=settings.TIME_SLEEP,
                 method=RequestMethod.POST,
             )
 
             if response is None:
+                ne_lng += settings.DELTA
+                sw_lng += settings.DELTA
+                time.sleep(settings.TIME_SLEEP)
                 continue
+            good_request += 1
 
             count_add_places += data_processing_and_save_db(response.json(), places_id_set)
 
@@ -94,6 +102,7 @@ def _chargemap_parser() -> None:
         ne_lng = sw_lng + settings.DELTA
 
     logger.info(f'{count_add_places} places sent to the database')
+    logger.info(f'successful requests {good_request}/{count_request}')
 
 
 def chargemap_parser() -> None:
