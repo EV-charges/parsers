@@ -11,14 +11,21 @@ def make_request_proxy(
         url: str,
         method: str = RequestMethod.POST,
         timeout: float = 10,
-        retries: int = 2,
+        retries: int = 0,
         sleep_time: float = 1,
         retries_proxy: int = 2,
         data: dict | None = None,
         json: dict | None = None,
         params: dict | None = None,
 ) -> requests.Response | None:
-    proxy_ip = make_request(url=settings.PROXYPOOL_URL).json().get("proxy")
+    while True:
+        proxy_server_response = make_request(url=settings.PROXYPOOL_URL)
+        if proxy_server_response is None:
+            return None
+        proxy_ip = proxy_server_response.json().get('proxy')
+        if proxy_ip:
+            break
+
     proxy = {
         'http': 'http://' + proxy_ip,
         'https': 'http://' + proxy_ip

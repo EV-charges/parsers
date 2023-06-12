@@ -54,7 +54,7 @@ class ApiSettings(BaseSettings):
 
 
 class AllParsersSettings(BaseSettings):
-    PROXYPOOL_URL: str = 'http://http://127.0.0.1:5010/:5010/get?type=https'
+    PROXYPOOL_URL: str = 'http://127.0.0.1:5010/get?type=https'
     PARSERS_START_TIME: str = '12:00'
     SLEEP_TIME: int = 1
 
