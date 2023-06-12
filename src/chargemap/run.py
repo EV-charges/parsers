@@ -71,7 +71,7 @@ def _chargemap_parser() -> None:
                 "SWLng": sw_lng
             }
             count_request += 1
-            print(f'Запрос номер {count_request}')
+
             response = make_request_proxy(
                 url=settings.PLACES_URL,
                 data=data,

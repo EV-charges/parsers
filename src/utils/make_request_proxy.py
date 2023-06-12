@@ -1,6 +1,8 @@
-from src.utils.make_request import make_request, RequestMethod
+import requests
 from fake_useragent import UserAgent
+
 from settings import AllParsersSettings
+from src.utils.make_request import RequestMethod, make_request
 
 settings = AllParsersSettings()
 
@@ -15,7 +17,7 @@ def make_request_proxy(
         data: dict | None = None,
         json: dict | None = None,
         params: dict | None = None,
-):
+) -> requests.Response | None:
     proxy_ip = make_request(url=settings.PROXYPOOL_URL).json().get("proxy")
     proxy = {
         'http': 'http://' + proxy_ip,
