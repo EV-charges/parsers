@@ -28,7 +28,7 @@ def make_request_proxy(
         while True:
             proxy_server_response = make_request(url=settings.PROXYPOOL_URL)
             if proxy_server_response is None:
-                logger.error(f'Failed to make request to proxy')
+                logger.error('Failed to make request to proxy')
                 return None
             proxy_ip = proxy_server_response.json().get('proxy')
             if proxy_ip:
