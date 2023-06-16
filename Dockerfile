@@ -33,5 +33,3 @@ RUN groupadd -g 1500 poetry && \
 WORKDIR parser
 COPY --chown=poetry:poetry . .
 USER poetry
-
-

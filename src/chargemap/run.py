@@ -4,6 +4,7 @@ import time
 import schedule
 
 from settings import AllParsersSettings, ApiSettings, ChargemapSettings
+from src.utils.chargemap_classes import Point, ScanSquare
 from src.utils.getting_id_places_from_db import getting_id_places_from_db
 from src.utils.make_request import RequestMethod, make_request
 from src.utils.make_request_proxy import make_request_proxy
@@ -46,13 +47,13 @@ def data_processing_and_save_db(response_json: dict[str, int | dict], places_id_
 
 
 def _chargemap_parser() -> None:
-    # Стартовые координаты левой нижней точки
-    sw_lat = settings.SW_LAT
-    sw_lng = settings.SW_LNG
+    sw_point = Point(lat=settings.SW_LAT, lng=settings.SW_LNG)
 
-    # Стартовые координаты правой верхней точки
-    ne_lat = sw_lat + settings.DELTA
-    ne_lng = sw_lng + settings.DELTA
+    ne_lat = sw_point.lat + settings.DELTA
+    ne_lng = sw_point.lng + settings.DELTA
+    ne_point = Point(lat=ne_lat, lng=ne_lng)
+
+    scan_square = ScanSquare(sw_point, ne_point)
 
     places_id_set = getting_id_places_from_db(source_name=settings.SOURCE_NAME)
     logger.info(f'get {len(places_id_set)} places from db')
@@ -61,14 +62,14 @@ def _chargemap_parser() -> None:
     count_request = 0
 
     # Цикл сканирования
-    while sw_lat <= settings.NE_LAT:
-        while sw_lng <= settings.NE_LNG:
+    while scan_square.upper_border_check():
+        while scan_square.right_border_check():
             data = {
                 "city": "London",
-                "NELat": ne_lat,
-                "NELng": ne_lng,
-                "SWLat": sw_lat,
-                "SWLng": sw_lng
+                "NELat": scan_square.ne_lat,
+                "NELng": scan_square.ne_lng,
+                "SWLat": scan_square.sw_lat,
+                "SWLng": scan_square.sw_lng
             }
             count_request += 1
 
@@ -80,8 +81,7 @@ def _chargemap_parser() -> None:
             )
 
             if response is None:
-                ne_lng += settings.DELTA
-                sw_lng += settings.DELTA
+                scan_square.move_to_the_right()
                 time.sleep(settings.TIME_SLEEP)
                 continue
             good_request += 1
@@ -89,17 +89,14 @@ def _chargemap_parser() -> None:
             count_add_places += data_processing_and_save_db(response.json(), places_id_set)
 
             # Сдвигаемся вправо
-            ne_lng += settings.DELTA
-            sw_lng += settings.DELTA
+            scan_square.move_to_the_right()
             time.sleep(settings.TIME_SLEEP)
 
         # Поднимаемся наверх
-        ne_lat += settings.DELTA
-        sw_lat += settings.DELTA
+        scan_square.move_to_the_top()
 
         # Возвращаемся в начало строки
-        sw_lng = settings.SW_LNG
-        ne_lng = sw_lng + settings.DELTA
+        scan_square.returning_to_the_beginning_of_the_line()
 
     logger.info(f'{count_add_places} places sent to the database')
     logger.info(f'successful requests {good_request}/{count_request}')

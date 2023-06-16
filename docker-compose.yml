@@ -9,6 +9,7 @@ services:
     image: parser
     environment:
       PROXYPOOL_URL: "http://proxy_pool:5010/get/?type=https"
+      IS_DEBUG: false
     command: [
       "python",
       "./run.py",
@@ -20,6 +21,9 @@ services:
     image: parser
     networks:
       - parsers_network
+    environment:
+      PROXYPOOL_URL: "http://proxy_pool:5010/get/?type=https"
+      IS_DEBUG: false
     command: [
       "python",
       "./run.py",
@@ -37,8 +41,6 @@ services:
     image: jhao104/proxy_pool
     networks:
       - parsers_network
-    ports:
-      - "5010:5010"
     environment:
       DB_CONN: "redis://:redis_password@redis:6379/0"
 
