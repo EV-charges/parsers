@@ -6,6 +6,7 @@ import schedule
 from settings import AllParsersSettings, ApiSettings, ElectromapsSettings
 from src.utils.getting_id_places_from_db import getting_id_places_from_db
 from src.utils.make_request import RequestMethod, make_request
+from src.utils.make_request_proxy import make_request_proxy
 
 settings = ElectromapsSettings()
 api_settings = ApiSettings()
@@ -38,7 +39,7 @@ def _electromaps_parser() -> list[dict[str, int | str | float]]:
     logger.info(f'get {len(already_saved_ids)} already saved ids from db')
 
     coordinates = settings.coordinates
-    response = make_request(url=settings.PLACES_URL + coordinates)
+    response = make_request_proxy(url=settings.PLACES_URL + coordinates, retries_proxy=15, method=RequestMethod.GET)
 
     if not response:
         logger.error('Can not get places')
