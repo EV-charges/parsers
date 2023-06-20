@@ -7,7 +7,7 @@ from settings import AllParsersSettings
 from src.utils.make_request import RequestMethod, make_request
 
 settings = AllParsersSettings()
-logger = getLogger(__name__)
+logger = getLogger()
 
 
 def make_request_proxy(
