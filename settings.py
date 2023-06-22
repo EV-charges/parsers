@@ -42,7 +42,7 @@ class ElectromapsSettings(BaseSettings):
     def coordinates(self) -> str:
         return f'?latNE={self.NE_LAT}&lngNE={self.NE_LNG}&latSW={self.SW_LAT}&lngSW={self.SW_LNG}'
 
-    LIMIT = 10
+    LIMIT = 100
     OFFSET = 0
 
     HEADERS = {
