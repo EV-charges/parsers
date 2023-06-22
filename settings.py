@@ -18,7 +18,6 @@ PARSERS_TYPES = [pt.value for pt in ParserType]
 
 
 class ChargemapSettings(BaseSettings):
-
     PLACES_URL: str = 'https://chargemap.com/json/charging/pools/get_from_areas'
     TIME_SLEEP: int = 1
 
@@ -32,7 +31,7 @@ class ChargemapSettings(BaseSettings):
 
 
 class ElectromapsSettings(BaseSettings):
-    PLACES_URL: str = 'https://www.electromaps.com/mapi/v2/locations?'
+    PLACES_URL: str = 'https://www.electromaps.com/mapi/v2/locations'
 
     NE_LAT: float = 51.74
     NE_LNG: float = 0.4
@@ -41,7 +40,23 @@ class ElectromapsSettings(BaseSettings):
 
     @property
     def coordinates(self) -> str:
-        return f'latNE={self.NE_LAT}&lngNE={self.NE_LNG}&latSW={self.SW_LAT}&lngSW={self.SW_LNG}'
+        return f'?latNE={self.NE_LAT}&lngNE={self.NE_LNG}&latSW={self.SW_LAT}&lngSW={self.SW_LNG}'
+
+    LIMIT = 10
+    OFFSET = 0
+
+    HEADERS = {
+        'X-Em-Oidc-Accesstoken': 'pass',
+        'X-Em-Oidc-Data': 'pass'
+    }
+
+    def comments(
+            self,
+            place_id: int,
+            limit: int,
+            offset: int
+    ) -> str:
+        return f'/{place_id}/comments?limit={limit}&offset={offset}'
 
     TIME_SLEEP = 1
     SOURCE_NAME: str = 'electromaps'
@@ -50,6 +65,7 @@ class ElectromapsSettings(BaseSettings):
 class ApiSettings(BaseSettings):
     GET_LIST_ALL_PlACES = 'http://209.38.204.96:8080/api/v1/places'
     POST_PLACES = 'http://209.38.204.96:8080/api/v1/places'
+    POST_COMMENTS = 'http://209.38.204.96:8080/api/v1/comments'
     NUMBER_RECORDS_IN_ONE_QUERY: int = 100
 
 
@@ -59,6 +75,7 @@ class AllParsersSettings(BaseSettings):
 
 
 class Settings(BaseSettings):
-
     class Config:
         case_sensitive = False
+
+

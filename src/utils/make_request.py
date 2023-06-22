@@ -22,6 +22,7 @@ def make_request(
         json: dict = None,
         params: dict = None,
         proxy: dict = None,
+        headers: dict = None,
         allow_status_codes: tuple[int, ...] = None
 ) -> requests.Response | None:
     try:
@@ -32,7 +33,8 @@ def make_request(
             timeout=timeout,
             params=params,
             json=json,
-            proxies=proxy
+            proxies=proxy,
+            headers=headers
         )
         if allow_status_codes and r.status_code in allow_status_codes:
             return
