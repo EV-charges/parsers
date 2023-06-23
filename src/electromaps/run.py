@@ -67,9 +67,11 @@ def comment_parsing() -> list[dict[int, list]]:
     return result
 
 
-def processing_comments() -> list[dict]:
+def processing_comments(
+        places_list: list[dict[int, list]]
+) -> list[dict]:
     result = []
-    places_list = comment_parsing()
+
     for place in places_list:
         for place_id, comments_lists in place.items():
             comments_list = extracts_dicts(comments_lists)
@@ -115,7 +117,8 @@ def _electromaps_parser() -> list[dict[str, int | str | float]]:
 
     logger.info(f'All {places_added} places added in db')
 
-    comments = processing_comments()
+    places_list = comment_parsing()
+    comments = processing_comments(places_list)
     comments_added = 0
     for comment in comments:
         r = make_request(url=api_settings.POST_COMMENTS, json=comment, method=RequestMethod.POST)
