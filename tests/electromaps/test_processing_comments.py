@@ -34,7 +34,7 @@ def test_processing_comments_one_comment() -> None:
     }]
 
 
-def test_processing_comments_few_comments() -> None:
+def test_processing_comments_many_comments() -> None:
     res = processing_comments(
         [{349444:
             [

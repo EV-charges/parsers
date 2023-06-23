@@ -1,6 +1,7 @@
 
 
 def extracts_dicts(data: list[list] | list[dict] | dict) -> list[dict]:
+    # TODO: удалить
     result = []
     if isinstance(data, dict):
         result.append(data)
