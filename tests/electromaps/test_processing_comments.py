@@ -1,13 +1,13 @@
 from src.electromaps.run import processing_comments
 
 
-def test_processing_comments_one_comment():
+def test_processing_comments_one_comment() -> None:
     res = processing_comments(
         [{349444:
             [
                 {
                     "idcomment": 353292,
-                    "comment": "Esto es un p... cachondeo. Necesitamos una legislacion acorde. Esto se arregla unicamente de una forma. Si se da la autorizacion a montar un cargador electrico, DE LA MARCA QUE SEA. Si no esta reparado y funcionando en 48 horas, PENALIZACION A LA COMPA\u00d1IA.",
+                    "comment": "Esto es un p... cachondeo.",
                     "connector": 'null',
                     "score": 'null',
                     "charged": 'null',
@@ -15,7 +15,7 @@ def test_processing_comments_one_comment():
                     "created_by": {
                         "id": 173202,
                         "username": "ToniGonzalez",
-                        "avatar": "https:\/\/cfassets.electromaps.com\/img\/account_150x150.png",
+                        "avatar": "https://cfassets.electromaps.com/img/account_150x150.png",
                         "electromaps_uuid": "945f2144-92b6-46f6-acf5-78c58a7ad1c5"
                     },
                     "report_status": 'null'
@@ -28,19 +28,19 @@ def test_processing_comments_one_comment():
         'place_id': 349444,
         'comment_id': 353292,
         'author': 'ToniGonzalez',
-        'text': 'Esto es un p... cachondeo. Necesitamos una legislacion acorde. Esto se arregla unicamente de una forma. Si se da la autorizacion a montar un cargador electrico, DE LA MARCA QUE SEA. Si no esta reparado y funcionando en 48 horas, PENALIZACION A LA COMPAÑIA.',
+        'text': 'Esto es un p... cachondeo.',
         'publication_date': '2023-02-28T15:42:11+0000',
         'source': 'electromaps'
     }]
 
 
-def test_processing_comments_few_comments():
+def test_processing_comments_few_comments() -> None:
     res = processing_comments(
         [{349444:
             [
                 {
                     "idcomment": 353292,
-                    "comment": "Esto es un p... cachondeo. Necesitamos una legislacion acorde. Esto se arregla unicamente de una forma. Si se da la autorizacion a montar un cargador electrico, DE LA MARCA QUE SEA. Si no esta reparado y funcionando en 48 horas, PENALIZACION A LA COMPA\u00d1IA.",
+                    "comment": "Esto es un p... cachondeo.",
                     "connector": 'null',
                     "score": 'null',
                     "charged": 'null',
@@ -80,7 +80,7 @@ def test_processing_comments_few_comments():
             'place_id': 349444,
             'comment_id': 353292,
             'author': 'ToniGonzalez',
-            'text': 'Esto es un p... cachondeo. Necesitamos una legislacion acorde. Esto se arregla unicamente de una forma. Si se da la autorizacion a montar un cargador electrico, DE LA MARCA QUE SEA. Si no esta reparado y funcionando en 48 horas, PENALIZACION A LA COMPAÑIA.',
+            'text': 'Esto es un p... cachondeo.',
             'publication_date': '2023-02-28T15:42:11+0000',
             'source': 'electromaps'
         },
@@ -95,14 +95,14 @@ def test_processing_comments_few_comments():
     ]
 
 
-def test_processing_comments_from_few_places():
+def test_processing_comments_from_few_places() -> None:
     res = processing_comments(
         [
             {349444:
                 [
                     {
                         "idcomment": 353292,
-                        "comment": "Esto es un p... cachondeo. Necesitamos una legislacion acorde. Esto se arregla unicamente de una forma. Si se da la autorizacion a montar un cargador electrico, DE LA MARCA QUE SEA. Si no esta reparado y funcionando en 48 horas, PENALIZACION A LA COMPA\u00d1IA.",
+                        "comment": "Esto es un p... cachondeo.",
                         "connector": 'null',
                         "score": 'null',
                         "charged": 'null',
@@ -151,7 +151,8 @@ def test_processing_comments_from_few_places():
                         "created_by": {
                             "id": 334395,
                             "username": "Pedro_hueva",
-                            "avatar": "https:\/\/cfmedia.electromaps.com\/profile_images\/5418501c9a4efb0dc185eac95abf3889_l.jpg",
+                            "avatar": "https://cfmedia.electromaps.com/profile_images/5418501c9a4efb0dc185eac95abf3889_"
+                                      "l.jpg",
                             "electromaps_uuid": "b0460511-f885-4060-991d-0c9b7499861d"
                         },
                         "report_status": "WORKING"
@@ -165,7 +166,7 @@ def test_processing_comments_from_few_places():
             'place_id': 349444,
             'comment_id': 353292,
             'author': 'ToniGonzalez',
-            'text': 'Esto es un p... cachondeo. Necesitamos una legislacion acorde. Esto se arregla unicamente de una forma. Si se da la autorizacion a montar un cargador electrico, DE LA MARCA QUE SEA. Si no esta reparado y funcionando en 48 horas, PENALIZACION A LA COMPAÑIA.',
+            'text': 'Esto es un p... cachondeo.',
             'publication_date': '2023-02-28T15:42:11+0000',
             'source': 'electromaps'
         },
