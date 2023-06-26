@@ -52,7 +52,8 @@ def make_request(
                 retries=retries - 1,
                 json=json,
                 params=params,
-                proxy=proxy
+                proxy=proxy,
+                headers=headers
             )
         logger.info(f'Failed to make request to {method.upper()} {url}')
         return None
