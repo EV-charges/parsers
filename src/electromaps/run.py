@@ -7,6 +7,7 @@ import schedule
 from settings import AllParsersSettings, ApiSettings, ElectromapsSettings
 from src.utils.getting_id_places_from_db import getting_id_places_from_db
 from src.utils.make_request import RequestMethod, make_request
+
 #from src.utils.make_request_proxy import make_request_proxy
 
 settings = ElectromapsSettings()
