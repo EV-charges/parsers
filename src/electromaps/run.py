@@ -1,10 +1,10 @@
 import logging
 import time
 
+import requests
 import schedule
 
 from settings import AllParsersSettings, ApiSettings, ElectromapsSettings
-from src.utils.extract_dicts import extracts_dicts
 from src.utils.getting_id_places_from_db import getting_id_places_from_db
 from src.utils.make_request import RequestMethod, make_request
 from src.utils.make_request_proxy import make_request_proxy
@@ -16,8 +16,7 @@ time_settings = AllParsersSettings()
 logger = logging.getLogger(__name__)
 
 
-# TODO: processing_places
-def processing_data(
+def processing_places(
         locations_dict: list[dict]
 ) -> list[dict[str, int | str | float]]:
     result = []
@@ -53,10 +52,14 @@ def processing_comments(
     return result
 
 
+def places_parsing() -> list[dict] | None:
+    coordinates = settings.coordinates
+    response = make_request(url=settings.PLACES_URL, params=coordinates)
+    response = make_request_proxy(url=settings.PLACES_URL + coordinates, retries_proxy=15, method=RequestMethod.GET)
 
-# TODO:
-def places_parsing():
-    pass
+    if not response:
+        return
+    return response.json()
 
 
 def comments_parsing() -> dict[int, list]:
@@ -69,7 +72,6 @@ def comments_parsing() -> dict[int, list]:
         offset = settings.OFFSET
         place_comments = []
 
-        # TODO : проверить что работает
         while True:
             url = settings.PLACES_URL + f'/{place_id}/comments'
 
@@ -95,46 +97,43 @@ def comments_parsing() -> dict[int, list]:
     return result
 
 
-# TODO
-def uploading_places():
-    pass
+def uploading_places(place: dict) -> requests.Response | None:
+    r = make_request(
+        url=api_settings.get_or_post_places,
+        json=place,
+        method=RequestMethod.POST,
+        allow_status_codes=(409,)
+    )
+    return r
 
 
-# TODO
-def uploading_comments():
-    pass
+def uploading_comments(comment: dict) -> requests.Response | None:
+    r = make_request(
+        url=api_settings.post_comments,
+        json=comment,
+        method=RequestMethod.POST,
+        allow_status_codes=(409,)
+    )
+    return r
 
 
-def _electromaps_parser() -> list[dict[str, int | str | float]]:
+def _electromaps_parser() -> None:
     already_saved_ids = getting_id_places_from_db(settings.SOURCE_NAME)
     logger.info(f'get {len(already_saved_ids)} already saved ids from db')
 
-    coordinates = settings.coordinates
-    response = make_request(url=settings.PLACES_URL + coordinates, params={
-        # TODO
-        'latNE': '',
-
-    })
-    response = make_request_proxy(url=settings.PLACES_URL + coordinates, retries_proxy=15, method=RequestMethod.GET)
-
-    if not response:
+    places = places_parsing()
+    if not places:
         logger.error('Can not get places')
-        return
 
-    new_parsing_places = processing_data(response.json())
+    new_parsing_places = processing_places(places)
 
     places_added = 0
     for place in new_parsing_places:
         if place['inner_id'] in already_saved_ids:
             continue
 
-        r = make_request(
-            url=api_settings.POST_PLACES,
-            json=place,
-            method=RequestMethod.POST,
-            allow_status_codes=(409,)
-        )
-        if r:
+        place_add = uploading_places(place)
+        if place_add:
             places_added += 1
 
     logger.info(f'All {places_added} places added in db')
@@ -143,11 +142,11 @@ def _electromaps_parser() -> list[dict[str, int | str | float]]:
     comments = processing_comments(places_comments)
     comments_added = 0
 
-    #TODO: check 409
     for comment in comments:
-        r = make_request(url=api_settings.POST_COMMENTS, json=comment, method=RequestMethod.POST)
-        if r:
+        comment_add = uploading_comments(comment)
+        if comment_add:
             comments_added += 1
+
     logger.info(f'All {comments_added} comments added in db')
 
 

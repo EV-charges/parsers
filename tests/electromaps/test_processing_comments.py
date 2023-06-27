@@ -3,7 +3,7 @@ from src.electromaps.run import processing_comments
 
 def test_processing_comments_one_comment() -> None:
     res = processing_comments(
-        [{349444:
+        {349444:
             [
                 {
                     "idcomment": 353292,
@@ -21,7 +21,7 @@ def test_processing_comments_one_comment() -> None:
                     "report_status": 'null'
                 }
             ]
-        }]
+        }
     )
 
     assert res == [{
@@ -36,7 +36,7 @@ def test_processing_comments_one_comment() -> None:
 
 def test_processing_comments_many_comments() -> None:
     res = processing_comments(
-        [{349444:
+        {349444:
             [
                 {
                     "idcomment": 353292,
@@ -72,7 +72,7 @@ def test_processing_comments_many_comments() -> None:
                     "report_status": "CHARGE_ERROR"
                 }
             ]
-        }]
+        }
     )
 
     assert res == [
@@ -95,10 +95,10 @@ def test_processing_comments_many_comments() -> None:
     ]
 
 
-def test_processing_comments_from_few_places() -> None:
+def test_processing_comments_from_many_places() -> None:
     res = processing_comments(
-        [
-            {349444:
+        {
+            349444:
                 [
                     {
                         "idcomment": 353292,
@@ -133,10 +133,9 @@ def test_processing_comments_from_few_places() -> None:
                         },
                         "report_status": "CHARGE_ERROR"
                     }
-                ]
-            },
+                ],
 
-            {277591:
+            277591:
                 [
                     {
                         "idcomment": 366892,
@@ -158,9 +157,9 @@ def test_processing_comments_from_few_places() -> None:
                         "report_status": "WORKING"
                     }
                 ]
-            }
-        ]
+        }
     )
+
     assert res == [
         {
             'place_id': 349444,
@@ -186,5 +185,4 @@ def test_processing_comments_from_few_places() -> None:
             'publication_date': '2023-04-02T11:43:27+0000',
             'source': 'electromaps'
         }
-
     ]

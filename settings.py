@@ -33,28 +33,23 @@ class ChargemapSettings(BaseSettings):
 class ElectromapsSettings(BaseSettings):
     PLACES_URL: str = 'https://www.electromaps.com/mapi/v2/locations'
 
-    NE_LAT: float = 51.74
-    NE_LNG: float = 0.4
-    SW_LAT: float = 51.05
-    SW_LNG: float = -0.7
-
-    @property
-    def coordinates(self) -> str:
-        return f'?latNE={self.NE_LAT}&lngNE={self.NE_LNG}&latSW={self.SW_LAT}&lngSW={self.SW_LNG}'
+    NE_LAT = 51.74
+    NE_LNG = 0.4
+    SW_LAT = 51.05
+    SW_LNG = -0.7
 
     @property
     def coordinates(self) -> dict:
-        # TODO
         return {
-            'latNE': self.NE_LAT
-        }
-        # return f'?latNE={self.NE_LAT}&lngNE={self.NE_LNG}&latSW={self.SW_LAT}&lngSW={self.SW_LNG}'
+            'latNE': self.NE_LAT,
+            'lngNE': self.NE_LNG,
+            'latSW': self.SW_LAT,
+            'lngSW': self.SW_LNG
+            }
 
     LIMIT: int = 100
     OFFSET: int = 0
 
-
-    # TODO
     HEADERS = {
         'X-Em-Oidc-Accesstoken': 'pass',
         'X-Em-Oidc-Data': 'pass'
@@ -67,14 +62,15 @@ class ElectromapsSettings(BaseSettings):
 class ApiSettings(BaseSettings):
     BASE_URL: str = 'http://209.38.204.96:8080/api/v1'
 
-    # TODO
+    # TODO # Можно ли оставить 1 функцию для get places и post places?
     @property
-    def get_list_all_places(self) -> str:
+    def get_or_post_places(self) -> str:
         return f'{self.BASE_URL}/places'
 
-    # GET_LIST_ALL_PlACES = 'http://209.38.204.96:8080/api/v1/places'
-    POST_PLACES = 'http://209.38.204.96:8080/api/v1/places'
-    POST_COMMENTS = 'http://209.38.204.96:8080/api/v1/comments'
+    @property
+    def post_comments(self) -> str:
+        return f'{self.BASE_URL}/comments'
+
     NUMBER_RECORDS_IN_ONE_QUERY: int = 100
 
 
