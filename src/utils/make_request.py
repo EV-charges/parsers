@@ -12,7 +12,7 @@ class RequestMethod(StrEnum):
     POST = auto()
 
 
-def make_request(
+def zmake_request(
         url: str,
         data: dict = None,
         method: str = RequestMethod.GET,

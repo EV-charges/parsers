@@ -42,28 +42,37 @@ class ElectromapsSettings(BaseSettings):
     def coordinates(self) -> str:
         return f'?latNE={self.NE_LAT}&lngNE={self.NE_LNG}&latSW={self.SW_LAT}&lngSW={self.SW_LNG}'
 
-    LIMIT = 100
-    OFFSET = 0
+    @property
+    def coordinates(self) -> dict:
+        # TODO
+        return {
+            'latNE': self.NE_LAT
+        }
+        # return f'?latNE={self.NE_LAT}&lngNE={self.NE_LNG}&latSW={self.SW_LAT}&lngSW={self.SW_LNG}'
 
+    LIMIT: int = 100
+    OFFSET: int = 0
+
+
+    # TODO
     HEADERS = {
         'X-Em-Oidc-Accesstoken': 'pass',
         'X-Em-Oidc-Data': 'pass'
     }
-
-    def comments(
-            self,
-            place_id: int,
-            limit: int,
-            offset: int
-    ) -> str:
-        return f'/{place_id}/comments?limit={limit}&offset={offset}'
 
     TIME_SLEEP = 1
     SOURCE_NAME: str = 'electromaps'
 
 
 class ApiSettings(BaseSettings):
-    GET_LIST_ALL_PlACES = 'http://209.38.204.96:8080/api/v1/places'
+    BASE_URL: str = 'http://209.38.204.96:8080/api/v1'
+
+    # TODO
+    @property
+    def get_list_all_places(self) -> str:
+        return f'{self.BASE_URL}/places'
+
+    # GET_LIST_ALL_PlACES = 'http://209.38.204.96:8080/api/v1/places'
     POST_PLACES = 'http://209.38.204.96:8080/api/v1/places'
     POST_COMMENTS = 'http://209.38.204.96:8080/api/v1/comments'
     NUMBER_RECORDS_IN_ONE_QUERY: int = 100
@@ -79,5 +88,3 @@ class AllParsersSettings(BaseSettings):
 class Settings(BaseSettings):
     class Config:
         case_sensitive = False
-
-
