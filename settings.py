@@ -33,10 +33,10 @@ class ChargemapSettings(BaseSettings):
 class ElectromapsSettings(BaseSettings):
     PLACES_URL: str = 'https://www.electromaps.com/mapi/v2/locations'
 
-    NE_LAT = 51.74
-    NE_LNG = 0.4
-    SW_LAT = 51.05
-    SW_LNG = -0.7
+    NE_LAT: float = 51.74
+    NE_LNG: float = 0.4
+    SW_LAT: float = 51.05
+    SW_LNG: float = -0.7
 
     @property
     def coordinates(self) -> dict:
@@ -62,13 +62,12 @@ class ElectromapsSettings(BaseSettings):
 class ApiSettings(BaseSettings):
     BASE_URL: str = 'http://209.38.204.96:8080/api/v1'
 
-    # TODO # Можно ли оставить 1 функцию для get places и post places?
     @property
-    def get_or_post_places(self) -> str:
+    def get_or_post_places_url(self) -> str:
         return f'{self.BASE_URL}/places'
 
     @property
-    def post_comments(self) -> str:
+    def post_comments_url(self) -> str:
         return f'{self.BASE_URL}/comments'
 
     NUMBER_RECORDS_IN_ONE_QUERY: int = 100

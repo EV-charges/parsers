@@ -7,8 +7,7 @@ import schedule
 from settings import AllParsersSettings, ApiSettings, ElectromapsSettings
 from src.utils.getting_id_places_from_db import getting_id_places_from_db
 from src.utils.make_request import RequestMethod, make_request
-
-#from src.utils.make_request_proxy import make_request_proxy
+from src.utils.make_request_proxy import make_request_proxy
 
 settings = ElectromapsSettings()
 api_settings = ApiSettings()
@@ -55,8 +54,12 @@ def processing_comments(
 
 def places_parsing() -> list[dict] | None:
     coordinates = settings.coordinates
-    response = make_request(url=settings.PLACES_URL, params=coordinates)
-    #response = make_request_proxy(url=settings.PLACES_URL + coordinates, retries_proxy=15, method=RequestMethod.GET)
+    response = make_request_proxy(
+        url=settings.PLACES_URL,
+        params=coordinates,
+        retries_proxy=15,
+        method=RequestMethod.GET
+    )
 
     if not response:
         return
@@ -75,14 +78,15 @@ def comments_parsing() -> dict[int, list]:
 
         while True:
             url = settings.PLACES_URL + f'/{place_id}/comments'
-
-            resp = make_request(
+            resp = make_request_proxy(
                 url=url,
                 headers=headers,
                 params={
                     'limit': limit,
                     'offset': offset
-                }
+                },
+                retries_proxy=15,
+                method=RequestMethod.GET
             )
             if not resp:
                 break
@@ -100,7 +104,7 @@ def comments_parsing() -> dict[int, list]:
 
 def uploading_places(place: dict) -> requests.Response | None:
     r = make_request(
-        url=api_settings.get_or_post_places,
+        url=api_settings.get_or_post_places_url,
         json=place,
         method=RequestMethod.POST,
         allow_status_codes=(409,)
@@ -110,7 +114,7 @@ def uploading_places(place: dict) -> requests.Response | None:
 
 def uploading_comments(comment: dict) -> requests.Response | None:
     r = make_request(
-        url=api_settings.post_comments,
+        url=api_settings.post_comments_url,
         json=comment,
         method=RequestMethod.POST,
         allow_status_codes=(409,)

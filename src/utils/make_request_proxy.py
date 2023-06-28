@@ -20,9 +20,9 @@ def make_request_proxy(
         data: dict | None = None,
         json: dict | None = None,
         params: dict | None = None,
+        headers: dict = dict
 ) -> requests.Response | None:
     proxy = None
-    headers = None
 
     if settings.IS_DEBUG:
         while True:
@@ -40,10 +40,12 @@ def make_request_proxy(
         }
 
         user_agent = UserAgent().random
-        headers = {
-            'accept': '*/*',
-            'user-agent': user_agent
-        }
+        headers.update(
+            {
+                'accept': '*/*',
+                'user-agent': user_agent
+            }
+        )
 
     response = make_request(
         url=url,
