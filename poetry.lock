@@ -309,17 +309,6 @@ files = [
 ]
 
 [[package]]
-name = "python-logstash"
-version = "0.4.8"
-description = "Python logging handler for Logstash."
-category = "main"
-optional = false
-python-versions = "*"
-files = [
-    {file = "python-logstash-0.4.8.tar.gz", hash = "sha256:d04e1ce11ecc107e4a4f3b807fc57d96811e964a554081b3bbb44732f74ef5f9"},
-]
-
-[[package]]
 name = "requests"
 version = "2.29.0"
 description = "Python HTTP for Humans."
@@ -424,4 +413,4 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "caf4ee3168f340100957d0f4c07937712315da0c1cc38dffcf60c90f84800ae8"
+content-hash = "1769bc54a1bc9eb7969960a9f4ea6e9566e5608cb8c5a46208d90c4b9f78b6bf"
