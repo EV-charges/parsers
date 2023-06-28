@@ -12,7 +12,7 @@ settings = ElectromapsSettings()
 api_settings = ApiSettings()
 time_settings = AllParsersSettings()
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 
 def processing_data(

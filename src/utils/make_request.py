@@ -4,7 +4,7 @@ from logging import getLogger
 
 import requests
 
-logger = getLogger(__name__)
+logger = getLogger()
 
 
 class RequestMethod(StrEnum):

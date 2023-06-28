@@ -7,7 +7,7 @@ from settings import AllParsersSettings
 from src.utils.make_request import RequestMethod, make_request
 
 settings = AllParsersSettings()
-logger = getLogger(__name__)
+logger = getLogger()
 
 
 def make_request_proxy(
@@ -24,9 +24,9 @@ def make_request_proxy(
     proxy = None
     headers = None
 
-    if settings.IS_DEBUG:
+    if not settings.IS_DEBUG:
         while True:
-            proxy_server_response = make_request(url=settings.PROXYPOOL_URL)
+            proxy_server_response = make_request(url=settings.PROXYPOOL_URL, retries=retries)
             if proxy_server_response is None:
                 logger.error('Failed to make request to proxy')
                 return None

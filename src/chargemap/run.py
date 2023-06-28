@@ -12,7 +12,7 @@ from src.utils.make_request_proxy import make_request_proxy
 settings = ChargemapSettings()
 api_settings = ApiSettings()
 time_settings = AllParsersSettings()
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 
 def data_processing_and_save_db(response_json: dict[str, int | dict], places_id_set: set[int]) -> int:
