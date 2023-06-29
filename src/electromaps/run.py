@@ -66,8 +66,7 @@ def places_parsing() -> list[dict] | None:
     return response.json()
 
 
-def comments_parsing() -> dict[int, list]:
-    headers = settings.HEADERS
+def comments_parsing(headers) -> dict[int, list]:
     places_ids = getting_id_places_from_db(settings.SOURCE_NAME)
 
     result = {}
@@ -100,6 +99,28 @@ def comments_parsing() -> dict[int, list]:
 
         result[place_id] = place_comments
     return result
+
+
+def get_access_token():
+    url = settings.URL_GET_TOKEN
+    headers = settings.HEADERS_GET_TOKEN
+    json = settings.json_get_token
+    response = make_request(
+        url=url,
+        method=RequestMethod.POST,
+        headers=headers,
+        json=json
+    )
+    if not response:
+        return "Can't get token"
+
+    auth_response = response.json()
+    access_tokens = auth_response['AuthenticationResult']
+    access_token_headers = {
+        'X-Em-Oidc-Accesstoken': access_tokens['AccessToken'],
+        'X-Em-Oidc-Data': access_tokens['IdToken']
+    }
+    return access_token_headers
 
 
 def uploading_places(place: dict) -> requests.Response | None:
@@ -143,10 +164,11 @@ def _electromaps_parser() -> None:
 
     logger.info(f'All {places_added} places added in db')
 
-    places_comments = comments_parsing()
+    access_tokens = get_access_token()
+    places_comments = comments_parsing(access_tokens)
     comments = processing_comments(places_comments)
-    comments_added = 0
 
+    comments_added = 0
     for comment in comments:
         comment_add = uploading_comments(comment)
         if comment_add:

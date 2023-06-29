@@ -50,10 +50,33 @@ class ElectromapsSettings(BaseSettings):
     LIMIT: int = 100
     OFFSET: int = 0
 
-    HEADERS = {
-        'X-Em-Oidc-Accesstoken': 'pass',
-        'X-Em-Oidc-Data': 'pass'
+    URL_GET_TOKEN = 'https://cognito-idp.eu-west-1.amazonaws.com/'
+
+    HEADERS_GET_TOKEN = {
+        "content-type": "application/x-amz-json-1.1",
+        "referer": "https://map.electromaps.com/",
+        "x-amz-target": "AWSCognitoIdentityProviderService.InitiateAuth",
     }
+
+    USERNAME: str
+    PASSWORD: str
+
+    @property
+    def json_get_token(self):
+        json_get_token = {
+            "AuthFlow": "USER_PASSWORD_AUTH",
+            "ClientId": "539ogq18bspa4d1v2bi01g5c01",
+            "AuthParameters": {
+                "USERNAME": self.USERNAME,
+                "PASSWORD": self.PASSWORD
+            },
+            "ClientMetadata": {}
+        }
+        return json_get_token
+
+    class Config:
+        case_sensitive = False
+        env_prefix = "ELECTROMAPS_"
 
     TIME_SLEEP = 1
     SOURCE_NAME: str = 'electromaps'
