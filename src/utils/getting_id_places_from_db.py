@@ -16,9 +16,9 @@ def getting_id_places_from_db(source_name: str) -> set[int]:
             "source": source_name
         }
 
-        places_from_database = make_request(url=api_settings.GET_LIST_ALL_PlACES, params=query_params)
-        if places_from_database is not None:
-            places = places_from_database.json()['places']
+        resp = make_request(url=api_settings.get_or_post_places, params=query_params)
+        if resp:
+            places = resp.json()['places']
 
             if not places:
                 return places_set
@@ -30,5 +30,4 @@ def getting_id_places_from_db(source_name: str) -> set[int]:
                 ]
                 places_set.update(inner_ids)
 
-        limit += api_settings.NUMBER_RECORDS_IN_ONE_QUERY
         offset += api_settings.NUMBER_RECORDS_IN_ONE_QUERY

@@ -18,7 +18,6 @@ PARSERS_TYPES = [pt.value for pt in ParserType]
 
 
 class ChargemapSettings(BaseSettings):
-
     PLACES_URL: str = 'https://chargemap.com/json/charging/pools/get_from_areas'
     TIME_SLEEP: int = 1
 
@@ -32,7 +31,7 @@ class ChargemapSettings(BaseSettings):
 
 
 class ElectromapsSettings(BaseSettings):
-    PLACES_URL: str = 'https://www.electromaps.com/mapi/v2/locations?'
+    PLACES_URL: str = 'https://www.electromaps.com/mapi/v2/locations'
 
     NE_LAT: float = 51.74
     NE_LNG: float = 0.4
@@ -40,16 +39,37 @@ class ElectromapsSettings(BaseSettings):
     SW_LNG: float = -0.7
 
     @property
-    def coordinates(self) -> str:
-        return f'latNE={self.NE_LAT}&lngNE={self.NE_LNG}&latSW={self.SW_LAT}&lngSW={self.SW_LNG}'
+    def coordinates(self) -> dict:
+        return {
+            'latNE': self.NE_LAT,
+            'lngNE': self.NE_LNG,
+            'latSW': self.SW_LAT,
+            'lngSW': self.SW_LNG
+            }
+
+    LIMIT: int = 100
+    OFFSET: int = 0
+
+    HEADERS = {
+        'X-Em-Oidc-Accesstoken': 'pass',
+        'X-Em-Oidc-Data': 'pass'
+    }
 
     TIME_SLEEP = 1
     SOURCE_NAME: str = 'electromaps'
 
 
 class ApiSettings(BaseSettings):
-    GET_LIST_ALL_PlACES = 'http://209.38.204.96:8080/api/v1/places'
-    POST_PLACES = 'http://209.38.204.96:8080/api/v1/places'
+    BASE_URL: str = 'http://209.38.204.96:8080/api/v1'
+
+    @property
+    def get_or_post_places_url(self) -> str:
+        return f'{self.BASE_URL}/places'
+
+    @property
+    def post_comments_url(self) -> str:
+        return f'{self.BASE_URL}/comments'
+
     NUMBER_RECORDS_IN_ONE_QUERY: int = 100
 
 
@@ -61,6 +81,5 @@ class AllParsersSettings(BaseSettings):
 
 
 class Settings(BaseSettings):
-
     class Config:
         case_sensitive = False

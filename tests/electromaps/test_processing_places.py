@@ -1,8 +1,8 @@
-from src.electromaps.run import processing_data
+from src.electromaps.run import processing_places
 
 
-def test_processing_data() -> dict:
-    res = processing_data(locations_dict=[
+def test_processing_places() -> None:
+    res = processing_places(locations_dict=[
         {
             'id': 8272,
             'latitude': 51.507022,

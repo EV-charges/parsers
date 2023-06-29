@@ -39,7 +39,7 @@ def data_processing_and_save_db(response_json: dict[str, int | dict], places_id_
                 'source': settings.SOURCE_NAME
             }
 
-            response = make_request(url=api_settings.POST_PLACES, json=place, method=RequestMethod.POST)
+            response = make_request(url=api_settings.get_or_post_places_url, json=place, method=RequestMethod.POST)
             if response:
                 count_add_places += 1
 
