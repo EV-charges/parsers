@@ -144,6 +144,17 @@ files = [
 ]
 
 [[package]]
+name = "dotenv"
+version = "0.0.5"
+description = "Handle .env files"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "dotenv-0.0.5.tar.gz", hash = "sha256:b58d2ab3f83dbd4f8a362b21158a606bee87317a9444485566b3c8f0af847091"},
+]
+
+[[package]]
 name = "fake-useragent"
 version = "1.1.3"
 description = "Up-to-date simple useragent faker with real world database"
@@ -412,4 +423,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "c453ef32de4141674da41510c5ddec79a16a828594d2071142fd3609bef9a189"
+content-hash = "60fceaa95bc3f1d4f243eb2c62c4efbdbbd902f241e0a7f3231fc9300acf933e"

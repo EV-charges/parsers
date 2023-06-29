@@ -74,12 +74,12 @@ class ElectromapsSettings(BaseSettings):
         }
         return json_get_token
 
+    TIME_SLEEP = 1
+    SOURCE_NAME: str = 'electromaps'
+
     class Config:
         case_sensitive = False
         env_prefix = "ELECTROMAPS_"
-
-    TIME_SLEEP = 1
-    SOURCE_NAME: str = 'electromaps'
 
 
 class ApiSettings(BaseSettings):
