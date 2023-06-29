@@ -62,7 +62,7 @@ class ElectromapsSettings(BaseSettings):
     PASSWORD: str
 
     @property
-    def json_get_token(self):
+    def json_get_token(self) -> dict:
         json_get_token = {
             "AuthFlow": "USER_PASSWORD_AUTH",
             "ClientId": "539ogq18bspa4d1v2bi01g5c01",

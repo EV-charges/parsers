@@ -66,7 +66,7 @@ def places_parsing() -> list[dict] | None:
     return response.json()
 
 
-def comments_parsing(headers) -> dict[int, list]:
+def comments_parsing(headers: dict) -> dict[int, list]:
     places_ids = getting_id_places_from_db(settings.SOURCE_NAME)
 
     result = {}
@@ -101,7 +101,7 @@ def comments_parsing(headers) -> dict[int, list]:
     return result
 
 
-def get_access_token():
+def get_access_token() -> dict | str:
     url = settings.URL_GET_TOKEN
     headers = settings.HEADERS_GET_TOKEN
     json = settings.json_get_token
@@ -112,6 +112,7 @@ def get_access_token():
         json=json
     )
     if not response:
+        # Временное решение, не до конца понимаю логику, что нам делать, если не получили токен
         return "Can't get token"
 
     auth_response = response.json()
