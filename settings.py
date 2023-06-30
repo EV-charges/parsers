@@ -58,8 +58,8 @@ class ElectromapsSettings(BaseSettings):
         "x-amz-target": "AWSCognitoIdentityProviderService.InitiateAuth",
     }
 
-    USERNAME: str
-    PASSWORD: str
+    USERNAME: str = 'testoviytest22121@gmail.com'
+    PASSWORD: str = 'Sobaka12'
 
     @property
     def json_get_token(self) -> dict:
