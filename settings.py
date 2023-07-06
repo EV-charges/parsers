@@ -19,24 +19,54 @@ PARSERS_TYPES = [pt.value for pt in ParserType]
 
 class ChargemapSettings(BaseSettings):
     PLACES_URL: str = 'https://chargemap.com/json/charging/pools/get_from_areas'
+
     TIME_SLEEP: int = 1
 
-    NE_LAT: float = 51.74
-    NE_LNG: float = 0.4
-    SW_LAT: float = 51.05
-    SW_LNG: float = -0.7
+    NE_LAT: float = 41.48
+    NE_LNG: float = 1.98
+    SW_LAT: float = 41.26
+    SW_LNG: float = 2.26
 
     DELTA: float = 0.06
     SOURCE_NAME: str = 'chargemap'
+
+    AUTHORIZATION_URL: str = 'https://chargemap.com/json/signin/index'
+    URL_GET_TOKEN: str = 'https://chargemap.com/map'
+
+    HEADERS_GET_TOKEN = {
+        "authority": "chargemap.com",
+        "accept": "application/json, text/plain, */*",
+        "accept-language": "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+                      "Chrome/114.0.0.0 Safari/537.36 OPR/100.0.0.0 (Edition Yx 05)"
+    }
+
+    LOGIN: str = 'testoviytest22121'
+    PASSWORD: str = 'Sobaka12'
+
+    @property
+    def json_get_token(self) -> dict:
+        json_get_token = {
+            "username": self.LOGIN,
+            "password": self.PASSWORD,
+            "remember": "False"
+        }
+        return json_get_token
+
+    RE_PATTERN_GET_TOKEN = r"var USER_TOKEN = '([^']+)';"
+
+    COMMENTS_URL: str = 'https://map.chargemap.com/community-feedbacks-api/feedbacks?moderation_status=VALIDATED,PENDING'
+    LIMIT: int = 100
+    OFFSET: int = 0
 
 
 class ElectromapsSettings(BaseSettings):
     PLACES_URL: str = 'https://www.electromaps.com/mapi/v2/locations'
 
-    NE_LAT: float = 51.74
-    NE_LNG: float = 0.4
-    SW_LAT: float = 51.05
-    SW_LNG: float = -0.7
+    NE_LAT: float = 41.48
+    NE_LNG: float = 1.98
+    SW_LAT: float = 41.26
+    SW_LNG: float = 2.26
 
     @property
     def coordinates(self) -> dict:
@@ -84,6 +114,7 @@ class ElectromapsSettings(BaseSettings):
 
 class ApiSettings(BaseSettings):
     BASE_URL: str = 'http://209.38.204.96:8080/api/v1'
+    TEST_URL: str = 'http://127.0.0.1:8080/api/v1'
 
     @property
     def get_or_post_places_url(self) -> str:
@@ -106,3 +137,6 @@ class AllParsersSettings(BaseSettings):
 class Settings(BaseSettings):
     class Config:
         case_sensitive = False
+
+
+api_settings = ApiSettings()

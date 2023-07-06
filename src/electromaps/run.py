@@ -1,16 +1,15 @@
 import logging
 import time
 
-import requests
 import schedule
 
-from settings import AllParsersSettings, ApiSettings, ElectromapsSettings
+from settings import AllParsersSettings, ElectromapsSettings
 from src.utils.getting_id_places_from_db import getting_id_places_from_db
 from src.utils.make_request import RequestMethod, make_request
 from src.utils.make_request_proxy import make_request_proxy
+from src.utils.uploading_db_functions import uploading_comments, uploading_places
 
 settings = ElectromapsSettings()
-api_settings = ApiSettings()
 time_settings = AllParsersSettings()
 
 logger = logging.getLogger(__name__)
@@ -122,26 +121,6 @@ def get_access_token() -> dict | str:
         'X-Em-Oidc-Data': access_tokens['IdToken']
     }
     return access_token_headers
-
-
-def uploading_places(place: dict) -> requests.Response | None:
-    r = make_request(
-        url=api_settings.get_or_post_places_url,
-        json=place,
-        method=RequestMethod.POST,
-        allow_status_codes=(409,)
-    )
-    return r
-
-
-def uploading_comments(comment: dict) -> requests.Response | None:
-    r = make_request(
-        url=api_settings.post_comments_url,
-        json=comment,
-        method=RequestMethod.POST,
-        allow_status_codes=(409,)
-    )
-    return r
 
 
 def _electromaps_parser() -> None:
