@@ -1,16 +1,15 @@
 import logging
 import time
 
-import requests
 import schedule
 
-from settings import AllParsersSettings, ApiSettings, ElectromapsSettings
+from settings import AllParsersSettings, ElectromapsSettings
 from src.utils.getting_id_places_from_db import getting_id_places_from_db
 from src.utils.make_request import RequestMethod, make_request
 from src.utils.make_request_proxy import make_request_proxy
+from src.utils.uploading_db_functions import uploading_comments, uploading_places
 
 settings = ElectromapsSettings()
-api_settings = ApiSettings()
 time_settings = AllParsersSettings()
 
 logger = logging.getLogger(__name__)
@@ -66,8 +65,7 @@ def places_parsing() -> list[dict] | None:
     return response.json()
 
 
-def comments_parsing() -> dict[int, list]:
-    headers = settings.HEADERS
+def comments_parsing(headers: dict) -> dict[int, list]:
     places_ids = getting_id_places_from_db(settings.SOURCE_NAME)
 
     result = {}
@@ -102,24 +100,27 @@ def comments_parsing() -> dict[int, list]:
     return result
 
 
-def uploading_places(place: dict) -> requests.Response | None:
-    r = make_request(
-        url=api_settings.get_or_post_places_url,
-        json=place,
+def get_access_token() -> dict | str:
+    url = settings.URL_GET_TOKEN
+    headers = settings.HEADERS_GET_TOKEN
+    json = settings.json_get_token
+    response = make_request(
+        url=url,
         method=RequestMethod.POST,
-        allow_status_codes=(409,)
+        headers=headers,
+        json=json
     )
-    return r
+    if not response:
+        # Временное решение, не до конца понимаю логику, что нам делать, если не получили токен
+        return "Can't get token"
 
-
-def uploading_comments(comment: dict) -> requests.Response | None:
-    r = make_request(
-        url=api_settings.post_comments_url,
-        json=comment,
-        method=RequestMethod.POST,
-        allow_status_codes=(409,)
-    )
-    return r
+    auth_response = response.json()
+    access_tokens = auth_response['AuthenticationResult']
+    access_token_headers = {
+        'X-Em-Oidc-Accesstoken': access_tokens['AccessToken'],
+        'X-Em-Oidc-Data': access_tokens['IdToken']
+    }
+    return access_token_headers
 
 
 def _electromaps_parser() -> None:
@@ -143,10 +144,11 @@ def _electromaps_parser() -> None:
 
     logger.info(f'All {places_added} places added in db')
 
-    places_comments = comments_parsing()
+    access_tokens = get_access_token()
+    places_comments = comments_parsing(access_tokens)
     comments = processing_comments(places_comments)
-    comments_added = 0
 
+    comments_added = 0
     for comment in comments:
         comment_add = uploading_comments(comment)
         if comment_add:

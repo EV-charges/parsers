@@ -16,7 +16,7 @@ def getting_id_places_from_db(source_name: str) -> set[int]:
             "source": source_name
         }
 
-        resp = make_request(url=api_settings.get_or_post_places, params=query_params)
+        resp = make_request(url=api_settings.get_or_post_places_url, params=query_params)
         if resp:
             places = resp.json()['places']
 

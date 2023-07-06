@@ -1,21 +1,26 @@
 import logging
+import re
 import time
 
 import schedule
+from requests import Session
 
-from settings import AllParsersSettings, ApiSettings, ChargemapSettings
+from settings import AllParsersSettings, ChargemapSettings
 from src.utils.chargemap_classes import Point, ScanSquare
 from src.utils.getting_id_places_from_db import getting_id_places_from_db
-from src.utils.make_request import RequestMethod, make_request
+from src.utils.make_request import RequestMethod
 from src.utils.make_request_proxy import make_request_proxy
+from src.utils.uploading_db_functions import uploading_comments, uploading_places
 
 settings = ChargemapSettings()
-api_settings = ApiSettings()
 time_settings = AllParsersSettings()
 logger = logging.getLogger(__name__)
 
 
-def data_processing_and_save_db(response_json: dict[str, int | dict], places_id_set: set[int]) -> int:
+def processing_places_and_save_db(
+        response_json: dict[str, int | dict],
+        places_id_set: set[int]
+) -> int:
     count_add_places = 0
     if response_json['count'] > 0:
         for pool in response_json['items']:
@@ -39,11 +44,95 @@ def data_processing_and_save_db(response_json: dict[str, int | dict], places_id_
                 'source': settings.SOURCE_NAME
             }
 
-            response = make_request(url=api_settings.get_or_post_places_url, json=place, method=RequestMethod.POST)
+            response = uploading_places(place)
+
             if response:
                 count_add_places += 1
 
     return count_add_places
+
+
+def get_access_token() -> dict | str:
+    headers = settings.HEADERS_GET_TOKEN
+    data = settings.json_get_token
+
+    work = Session()
+    authorization = work.post(
+        url=settings.AUTHORIZATION_URL,
+        headers=headers,
+        data=data
+    )
+
+    if not authorization:
+        return "Can't authorization"
+
+    r = work.get(settings.URL_GET_TOKEN,
+                 headers=headers)
+
+    match = re.search(settings.RE_PATTERN_GET_TOKEN, r.text)
+    if not match:
+        return "Can't get token"
+    user_token = match.group(1)
+
+    access_token_headers = {
+        'Authorization': user_token
+    }
+
+    return access_token_headers
+
+
+def comments_parsing(headers: dict) -> dict:
+    places_ids = getting_id_places_from_db(settings.SOURCE_NAME)
+
+    result = {}
+    for place_id in places_ids:
+        limit = settings.LIMIT
+        offset = settings.OFFSET
+        place_comments = []
+
+        while True:
+            url = settings.COMMENTS_URL
+            resp = make_request_proxy(
+                url=url,
+                headers=headers,
+                params={
+                    'pool_id': place_id,
+                    'offset': offset,
+                    'limit': limit
+                },
+                method=RequestMethod.GET
+            )
+            if not resp:
+                break
+            resp = resp.json()
+            comments = resp['items']
+
+            if not comments:
+                break
+
+            place_comments.extend(comments)
+            offset += limit
+
+        result[place_id] = place_comments
+    return result
+
+
+def processing_comments(
+        places_comments: dict[int, list]
+) -> list[dict]:
+    result = []
+
+    for place_id, comments in places_comments.items():
+        for comment in comments:
+            result.append({
+                'place_id': place_id,
+                'comment_id': comment['id'],
+                'author': comment['user_username'],
+                'text': comment.get('comment', 'No text'),
+                'publication_date': comment['creation_date'],
+                'source': 'chargemap'
+            })
+    return result
 
 
 def _chargemap_parser() -> None:
@@ -65,7 +154,7 @@ def _chargemap_parser() -> None:
     while scan_square.upper_border_check():
         while scan_square.right_border_check():
             data = {
-                "city": "London",
+                "city": "Barcelona",
                 "NELat": scan_square.ne_lat,
                 "NELng": scan_square.ne_lng,
                 "SWLat": scan_square.sw_lat,
@@ -86,7 +175,7 @@ def _chargemap_parser() -> None:
                 continue
             good_request += 1
 
-            count_add_places += data_processing_and_save_db(response.json(), places_id_set)
+            count_add_places += processing_places_and_save_db(response.json(), places_id_set)
 
             # Сдвигаемся вправо
             scan_square.move_to_the_right()
@@ -100,6 +189,19 @@ def _chargemap_parser() -> None:
 
     logger.info(f'{count_add_places} places sent to the database')
     logger.info(f'successful requests {good_request}/{count_request}')
+
+    access_token = get_access_token()
+    places_comments = comments_parsing(access_token)
+    comments = processing_comments(places_comments)
+
+    comments_added = 0
+    for comment in comments:
+
+        comment_add = uploading_comments(comment)
+        if comment_add:
+            comments_added += 1
+
+    logger.info(f'All {comments_added} comments added in db')
 
 
 def chargemap_parser() -> None:
