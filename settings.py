@@ -118,11 +118,11 @@ class ApiSettings(BaseSettings):
 
     @property
     def get_or_post_places_url(self) -> str:
-        return f'{self.BASE_URL}/places'
+        return f'{self.TEST_URL}/places'
 
     @property
     def post_comments_url(self) -> str:
-        return f'{self.BASE_URL}/comments'
+        return f'{self.TEST_URL}/comments'
 
     NUMBER_RECORDS_IN_ONE_QUERY: int = 100
 
