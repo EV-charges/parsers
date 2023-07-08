@@ -59,6 +59,12 @@ class ElectromapsSettings(BaseSettings):
     SOURCE_NAME: str = 'electromaps'
 
 
+class GooglemapsSettings(BaseSettings):
+    PLACES_URL: str = 'https://www.google.com/maps?hl=en'
+    SEARCH_CITY: str = 'Barcelona'
+    SOURCE_NAME: str = 'googlemaps'
+
+
 class ApiSettings(BaseSettings):
     BASE_URL: str = 'http://209.38.204.96:8080/api/v1'
 
